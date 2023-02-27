@@ -1,0 +1,1 @@
+shift + option + f - auto format
