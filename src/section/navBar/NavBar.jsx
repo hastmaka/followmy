@@ -5,7 +5,7 @@ import {styled} from '@mui/material/styles';
 const RootStyle = styled(Stack)(({theme}) => ({
     width: '100%',
     height: '60px',
-    borderBottom: '1px solid #999'
+    borderBottom: '1px solid #e2e2e2'
 }));
 
 export default function NavBar() {
