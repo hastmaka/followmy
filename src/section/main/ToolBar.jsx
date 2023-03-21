@@ -1,8 +1,8 @@
 // material
 import {Stack} from "@mui/material";
 import {styled} from '@mui/material/styles';
-import EzIconButton from "../../component/EzIconButton/EzIconButton";
-import EzText from "../../component/EzText/EzText";
+import EzIconButton from "../../components/EzIconButton/EzIconButton";
+import EzText from "../../components/EzText/EzText";
 import AddIcon from '@mui/icons-material/Add';
 import {GridRowModes} from "@mui/x-data-grid";
 import { createId } from "../../helper";
