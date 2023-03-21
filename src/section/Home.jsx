@@ -14,7 +14,7 @@ export default function Home() {
     <RootStyle>
         <NavBar/>
 
-        {/* <Form/>   */}
+        {/* <Form/> */}
 
         <Main/>
 
