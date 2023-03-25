@@ -275,7 +275,7 @@ export default function Main() {
                     }}
                     //style
                     getRowClassName={(params) => {
-                        debugger
+                        // debugger
                     }}
                     sx={({palette}) => ({
                         color: palette['white'],
