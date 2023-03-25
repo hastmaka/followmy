@@ -19,7 +19,16 @@ const RootStyle = styled(IconButton)(({theme}) => ({
 
 //----------------------------------------------------------------
 
-export default function EzCustomIconButton({icon, onClick, size, ariaLabel, toolTipTitle = '', ttPlacement = 'bottom', sx, ...rest}) {
+export default function EzCustomIconButton({
+                                               icon,
+                                               onClick,
+                                               size,
+                                               ariaLabel,
+                                               toolTipTitle = '',
+                                               ttPlacement = 'bottom',
+                                               sx,
+                                               ...rest
+                                           }) {
     return (
         <Tooltip title={toolTipTitle} arrow placement={ttPlacement}>
             <RootStyle

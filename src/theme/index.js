@@ -6,6 +6,7 @@ import {CssBaseline} from '@mui/material';
 import {createTheme, StyledEngineProvider, ThemeProvider as MUIThemeProvider} from '@mui/material/styles';
 //
 import palette from './palette';
+import componentsOverride from './overrides';
 
 // ----------------------------------------------------------------------
 
@@ -22,6 +23,7 @@ export default function ThemeProvider({children}) {
     );
 
     const theme = createTheme(themeOptions);
+    theme.components = componentsOverride(theme);
 
     return (
         <StyledEngineProvider injectFirst>

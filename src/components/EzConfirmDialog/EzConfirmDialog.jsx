@@ -46,7 +46,7 @@ export default function EzConfirmDialog() {
 
     let name = '',
         phrase = '';
-    if(confirmDialog.content !== '') {
+    if (confirmDialog.content !== '') {
         name = confirmDialog.content.split(' ').splice(-1).join(' ');
         phrase = confirmDialog.content.split(' ').slice(0, -1).join(' ');
     }
@@ -79,7 +79,7 @@ export default function EzConfirmDialog() {
                 }}
                 dividers
             >
-                {phrase} 
+                {phrase}
                 <Typography variant='span' sx={{fontWeight: 700}}>'{name}'</Typography>
             </DialogContent>
 

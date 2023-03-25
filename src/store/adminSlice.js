@@ -1,8 +1,10 @@
 import {createSlice} from '@reduxjs/toolkit';
+import {getAll} from "../helper/firebase/FirestoreApi";
 
 const adminSlice = createSlice({
     name: 'admin',
     initialState: {
+        user: {},
         modal: {
             open: false,
             who: null
@@ -22,11 +24,14 @@ const adminSlice = createSlice({
         },
     },
     reducers: {
+        setUser(state, {payload}){state.user = {...payload}},
         openModal(state, {payload}) {
             state.modal.open = true;
             state.modal.who = payload
         },
-        closeModal(state){state.modal.open = false},
+        closeModal(state) {
+            state.modal.open = false
+        },
 
         showNotification(state, {payload}) {
             state.notification = {
@@ -56,7 +61,18 @@ const adminSlice = createSlice({
             }
         },
     },
-    extraReducers: (builder) => {}
+    extraReducers: (builder) => {
+        builder.addCase(getAll.pending, (state, {meta}) => {
+            debugger
+        });
+        builder.addCase(getAll.fulfilled, (state, {payload, meta}) => {
+            debugger
+
+        });
+        builder.addCase(getAll.rejected, (state, {meta}) => {
+            debugger
+        });
+    }
 })
 
 export const generalSliceActions = adminSlice.actions;

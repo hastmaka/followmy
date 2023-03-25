@@ -22,10 +22,10 @@ export const useOnClickOutside = (ref, handler) => {
 export const useIsScroll = () => {
     useEffect(() => {
         const handleScroll = _ => {
-            if(Math.floor(window.scrollY) === 1) {
+            if (Math.floor(window.scrollY) === 1) {
                 // window.dispatch(generalSliceActions.setScroll(1))
             }
-            if(window.scrollY === 0) {
+            if (window.scrollY === 0) {
                 // window.dispatch(generalSliceActions.setScroll(0))
             }
         };
@@ -64,7 +64,7 @@ export const useLocalStorage = (key, initialValue) => {
         try {
             // Get from local storage by key
             const item = localStorage.getItem(key);
-            if(!item) {
+            if (!item) {
                 //set ls initial value
                 localStorage.setItem(key, JSON.stringify(initialValue))
             }
@@ -103,7 +103,7 @@ export const useNotification = () => {
     const clearNotification = _ => {
         window.dispatch(generalSliceActions.closeNotification())
     };
-    return { displayNotification, clearNotification }
+    return {displayNotification, clearNotification}
 };
 
 let resolveCallback;
@@ -122,5 +122,5 @@ export const useConfirmDialog = () => {
             resolveCallback = res;
         });
     };
-    return { onConfirm, onCancel, confirm }
+    return {onConfirm, onCancel, confirm}
 }

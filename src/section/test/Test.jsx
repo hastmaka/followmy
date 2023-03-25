@@ -60,7 +60,7 @@ export default function ProductGrid() {
     }, [productState]);
 
     useEffect(_ => {
-        if(productState.loaded)
+        if (productState.loaded)
             setRows(product)
     }, [product, productState]);
 
@@ -84,11 +84,11 @@ export default function ProductGrid() {
     //endregion
 
     const handleEditClick = useCallback((id) => {
-        setRowModesModel({...rowModesModel,[id]: {mode: GridRowModes.Edit}})
+        setRowModesModel({...rowModesModel, [id]: {mode: GridRowModes.Edit}})
     }, [rowModesModel]);
 
     const handleSaveClick = useCallback((id) => {
-        setRowModesModel({...rowModesModel,[id]: {mode: GridRowModes.View}})
+        setRowModesModel({...rowModesModel, [id]: {mode: GridRowModes.View}})
     }, [rowModesModel]);
 
     const handleCancelClick = useCallback((id) => {
@@ -108,7 +108,7 @@ export default function ProductGrid() {
         async (newRow, oldRow) => {
             await new Promise((resolve, reject) => {
                 //check empty field
-                if(!(!!newRow.name) || !(!!newRow.category)) {
+                if (!(!!newRow.name) || !(!!newRow.category)) {
                     return reject({type: 'error', content: 'No empty field allowed'});
                 } else if (newRow.price <= 0) {
                     return reject({type: 'error', content: 'Price must be greater then 0'});
@@ -116,13 +116,13 @@ export default function ProductGrid() {
                 debugger
                 resolve()
             })
-            if(JSON.stringify(newRow) === JSON.stringify(oldRow)) {
+            if (JSON.stringify(newRow) === JSON.stringify(oldRow)) {
                 return oldRow
             } else {
                 updateProductApi(newRow.id, newRow)
                 return newRow
             }
-        },[]
+        }, []
     );
 
     const handleRowEditStart = (params, event) => {
@@ -134,11 +134,11 @@ export default function ProductGrid() {
     };
 
     const handleChangeImage = (item) => {
-      debugger
+        debugger
     }
 
     const handleDeleteImage = (item) => {
-      debugger
+        debugger
     }
 
     const onImageClickHandler = async (images, e) => {
@@ -155,7 +155,8 @@ export default function ProductGrid() {
                 }
             }}>
             <EzSwiper allowTouchMove show data={images.map(item => {
-                return ({id: item.id, el:
+                return ({
+                    id: item.id, el:
                         <SwiperSlide>
                             <Stack sx={{position: 'relative'}}>
                                 <Stack
@@ -194,216 +195,217 @@ export default function ProductGrid() {
 
     const allProductsGridColumns = useMemo(
         () => [
-        {
-            field: 'id',
-            headerName: '#',
-            width: 40,
-            align: 'center',
-            headerAlign: 'center',
-            filterable: false,
-            renderCell: (index) => index.api.getRowIndex(index.row.id) + 1
-        }, {
-            field: 'name',
-            headerName: 'Name',
-            flex: 1,
-            align: 'center',
-            headerAlign: 'center',
-            editable: true,
-            renderCell: (params) => {
-                return <EzText text={params.row.name} sx={{fontSize: '13px'}}/>
-            }
-        }, {
-            field: 'image',
-            headerName: 'Image',
-            flex: 3,
-            align: 'center',
-            headerAlign: 'center',
-            renderCell: (params) => {
-                let addImgBtn = params.row.image.length === 4;
-                return (
-                    <Stack
-                        onClick={e => onImageClickHandler(params.row.image, e)}
-                        flexDirection='row'
-                        justifyContent='space-between'
-                        alignItems='center'
-                        sx={{width: 'fit-content', cursor: 'pointer'}}
-                        gap='10px'
-                    >
-                        <Stack flexDirection='row' sx={{height: '100%'}}>
-                            {params.row.image.map(i =>
-                                <img
-                                    // onClick={onImageClickHandler} //delete or update
-                                    key={i.id}
-                                    src={i.url}
-                                    alt={i.url}
-                                    style={{height: '100%', width: '50px'}}
-                                />
+            {
+                field: 'id',
+                headerName: '#',
+                width: 40,
+                align: 'center',
+                headerAlign: 'center',
+                filterable: false,
+                renderCell: (index) => index.api.getRowIndex(index.row.id) + 1
+            }, {
+                field: 'name',
+                headerName: 'Name',
+                flex: 1,
+                align: 'center',
+                headerAlign: 'center',
+                editable: true,
+                renderCell: (params) => {
+                    return <EzText text={params.row.name} sx={{fontSize: '13px'}}/>
+                }
+            }, {
+                field: 'image',
+                headerName: 'Image',
+                flex: 3,
+                align: 'center',
+                headerAlign: 'center',
+                renderCell: (params) => {
+                    let addImgBtn = params.row.image.length === 4;
+                    return (
+                        <Stack
+                            onClick={e => onImageClickHandler(params.row.image, e)}
+                            flexDirection='row'
+                            justifyContent='space-between'
+                            alignItems='center'
+                            sx={{width: 'fit-content', cursor: 'pointer'}}
+                            gap='10px'
+                        >
+                            <Stack flexDirection='row' sx={{height: '100%'}}>
+                                {params.row.image.map(i =>
+                                    <img
+                                        // onClick={onImageClickHandler} //delete or update
+                                        key={i.id}
+                                        src={i.url}
+                                        alt={i.url}
+                                        style={{height: '100%', width: '50px'}}
+                                    />
+                                )}
+                            </Stack>
+                            <Button
+                                ref={addBtnRef}
+                                disabled={addImgBtn}
+                                variant="outlined"
+                                component="label"
+                                sx={{
+                                    // marginRight: '20px',
+                                    minWidth: '46px',
+                                    cursor: 'pointer'
+                                }}
+                            >
+                                <input hidden accept="image/*" multiple type="file"/>
+                                <CameraAltIcon/>
+                            </Button>
+                        </Stack>
+                    )
+                }
+            }, {
+                field: 'color',
+                headerName: 'Color',
+                flex: 1,
+                align: 'center',
+                headerAlign: 'center',
+                renderCell: (params) => {
+                    let color = [];
+                    color = color.length ? params.row.color.map(c => color += `${c} `) : params.row.color;
+                    return (
+                        <Stack flexDirection='row' gap='5px'>
+                            {color.map((c, i) =>
+                                <EzText key={c} text={(i ? ', ' : '') + c} sx={{fontSize: '13px'}}/>
                             )}
                         </Stack>
-                        <Button
-                            ref={addBtnRef}
-                            disabled={addImgBtn}
-                            variant="outlined"
-                            component="label"
-                            sx={{
-                                // marginRight: '20px',
-                                minWidth: '46px',
-                                cursor: 'pointer'
-                            }}
-                        >
-                            <input hidden accept="image/*" multiple type="file" />
-                            <CameraAltIcon/>
-                        </Button>
-                    </Stack>
-                )
-            }
-        }, {
-            field: 'color',
-            headerName: 'Color',
-            flex: 1,
-            align: 'center',
-            headerAlign: 'center',
-            renderCell: (params) => {
-                let color = [];
-                color = color.length ? params.row.color.map(c => color += `${c} `) : params.row.color;
-                return (
-                    <Stack flexDirection='row' gap='5px'>
-                        {color.map((c, i) =>
-                            <EzText key={c} text={(i ? ', ' : '') + c} sx={{fontSize: '13px'}}/>
-                        )}
-                    </Stack>
-                )
-            }
-        }, {
-            field: 'size',
-            headerName: 'Size',
-            flex: 1,
-            align: 'center',
-            headerAlign: 'center',
-            renderCell: (params) => {
-                return (
-                    <Stack flexDirection='row' gap='5px'>
-                        {params.row.size.map((s, i) =>
-                            <EzText key={s} text={(i ? ', ' : '') + s} sx={{fontSize: '13px'}}/>
-                        )}
-                    </Stack>
-                )
-            }
-        }, {
-            field: 'category',
-            headerName: 'Category',
-            flex: 1,
-            align: 'center',
-            headerAlign: 'center',
-            editable: true,
-            renderCell: (params) => {
-                return (
-                    <Stack flexDirection='row' gap='5px'>
-                        {params.row.category.map((c, i) =>
-                            <EzText key={c} text={(i ? ', ' : '') + c} sx={{fontSize: '13px'}}/>
-                        )}
-                    </Stack>
-                )
-            }
-        }, {
-            field: 'price',
-            headerName: 'Price',
-            type: 'number',
-            flex: 1,
-            align: 'center',
-            headerAlign: 'center',
-            editable: true,
-            renderCell: ({value}) => {
-                return <EzText text={`$ ${value}`} sx={{fontSize: '13px'}}/>
-            }
-        }, {
-            field: 'active',
-            headerName: 'Active',
-            flex: 1,
-            align: 'center',
-            headerAlign: 'center',
-            type: 'boolean',
-            editable: true,
-            renderCell: (params) => {
-                let tempColor = params.row.active === true ? 'green' : 'red';
-                return <EzText text={params.row.active? 'true' : 'false'} sx={{fontSize: '13px', color: tempColor}}/>
-            }
-        }, {
-            field: 'action',
-            headerName: 'Action',
-            align: 'center',
-            headerAlign: 'center',
-            type: 'actions',
-            sortable: false,
-            getActions: (params) => {
-                const isInEditMode = rowModesModel[params.id]?.mode === GridRowModes.Edit;
-                // debugger
-
-                if(isInEditMode) {
-                    return [
-                        <GridActionsCellItem
-                            icon={<SaveIcon />}
-                            label="Save"
-                            onClick={_ => handleSaveClick(params.id)}
-                        />,
-                        <GridActionsCellItem
-                            icon={<CancelIcon />}
-                            label="Cancel"
-                            className="textPrimary"
-                            onClick={_ => handleCancelClick(params.id)}
-                            color="inherit"
-                        />,
-                    ];
+                    )
                 }
-                return [
-                    <Tooltip title="Variants">
-                        <GridActionsCellItem
-                            icon={<BorderAllIcon/>}
-                            label="Variants"
-                            onClick={_ => {
-                                openModal(<VariationGrid
-                                    variation={params.row.variation}
-                                    product={params.row}
-                                    productName={params.row.name}
-                                />)
-                            }}
-                            // showInMenu
-                        />
-                    </Tooltip>,
-                    <Tooltip title="Edit">
-                        <GridActionsCellItem
-                            icon={<EditIcon/>}
-                            label="Edit"
-                            // disabled={true}
-                            onClick={_ => handleEditClick(params.id)}
-                            // showInMenu
-                        />
-                    </Tooltip>,
-                    // <Tooltip title="Delete">
-                    //     <GridActionsCellItem
-                    //         icon={<DeleteIcon/>}
-                    //         label="Delete"
-                    //         onClick={_ => {
-                    //             window.confirm({type: 'warning', content: 'Sure want to delete this Product?'})
-                    //                 .then(res => {
-                    //                     if (res) {
-                    //                         setRows(prev => prev.filter(item => item.id !== params.id))
-                    //                         window.displayNotification({
-                    //                             title: 'Done',
-                    //                             type: 'success',
-                    //                             content: 'Product Deleted Successfully'
-                    //                         })
-                    //                     }
-                    //                 })
-                    //
-                    //         }}
-                    //
-                    //     />
-                    // </Tooltip>,
-                ]
-            },
-        }
-    ], [handleEditClick, handleSaveClick, handleCancelClick, rowModesModel]);
+            }, {
+                field: 'size',
+                headerName: 'Size',
+                flex: 1,
+                align: 'center',
+                headerAlign: 'center',
+                renderCell: (params) => {
+                    return (
+                        <Stack flexDirection='row' gap='5px'>
+                            {params.row.size.map((s, i) =>
+                                <EzText key={s} text={(i ? ', ' : '') + s} sx={{fontSize: '13px'}}/>
+                            )}
+                        </Stack>
+                    )
+                }
+            }, {
+                field: 'category',
+                headerName: 'Category',
+                flex: 1,
+                align: 'center',
+                headerAlign: 'center',
+                editable: true,
+                renderCell: (params) => {
+                    return (
+                        <Stack flexDirection='row' gap='5px'>
+                            {params.row.category.map((c, i) =>
+                                <EzText key={c} text={(i ? ', ' : '') + c} sx={{fontSize: '13px'}}/>
+                            )}
+                        </Stack>
+                    )
+                }
+            }, {
+                field: 'price',
+                headerName: 'Price',
+                type: 'number',
+                flex: 1,
+                align: 'center',
+                headerAlign: 'center',
+                editable: true,
+                renderCell: ({value}) => {
+                    return <EzText text={`$ ${value}`} sx={{fontSize: '13px'}}/>
+                }
+            }, {
+                field: 'active',
+                headerName: 'Active',
+                flex: 1,
+                align: 'center',
+                headerAlign: 'center',
+                type: 'boolean',
+                editable: true,
+                renderCell: (params) => {
+                    let tempColor = params.row.active === true ? 'green' : 'red';
+                    return <EzText text={params.row.active ? 'true' : 'false'}
+                                   sx={{fontSize: '13px', color: tempColor}}/>
+                }
+            }, {
+                field: 'action',
+                headerName: 'Action',
+                align: 'center',
+                headerAlign: 'center',
+                type: 'actions',
+                sortable: false,
+                getActions: (params) => {
+                    const isInEditMode = rowModesModel[params.id]?.mode === GridRowModes.Edit;
+                    // debugger
+
+                    if (isInEditMode) {
+                        return [
+                            <GridActionsCellItem
+                                icon={<SaveIcon/>}
+                                label="Save"
+                                onClick={_ => handleSaveClick(params.id)}
+                            />,
+                            <GridActionsCellItem
+                                icon={<CancelIcon/>}
+                                label="Cancel"
+                                className="textPrimary"
+                                onClick={_ => handleCancelClick(params.id)}
+                                color="inherit"
+                            />,
+                        ];
+                    }
+                    return [
+                        <Tooltip title="Variants">
+                            <GridActionsCellItem
+                                icon={<BorderAllIcon/>}
+                                label="Variants"
+                                onClick={_ => {
+                                    openModal(<VariationGrid
+                                        variation={params.row.variation}
+                                        product={params.row}
+                                        productName={params.row.name}
+                                    />)
+                                }}
+                                // showInMenu
+                            />
+                        </Tooltip>,
+                        <Tooltip title="Edit">
+                            <GridActionsCellItem
+                                icon={<EditIcon/>}
+                                label="Edit"
+                                // disabled={true}
+                                onClick={_ => handleEditClick(params.id)}
+                                // showInMenu
+                            />
+                        </Tooltip>,
+                        // <Tooltip title="Delete">
+                        //     <GridActionsCellItem
+                        //         icon={<DeleteIcon/>}
+                        //         label="Delete"
+                        //         onClick={_ => {
+                        //             window.confirm({type: 'warning', content: 'Sure want to delete this Product?'})
+                        //                 .then(res => {
+                        //                     if (res) {
+                        //                         setRows(prev => prev.filter(item => item.id !== params.id))
+                        //                         window.displayNotification({
+                        //                             title: 'Done',
+                        //                             type: 'success',
+                        //                             content: 'Product Deleted Successfully'
+                        //                         })
+                        //                     }
+                        //                 })
+                        //
+                        //         }}
+                        //
+                        //     />
+                        // </Tooltip>,
+                    ]
+                },
+            }
+        ], [handleEditClick, handleSaveClick, handleCancelClick, rowModesModel]);
 
     return (
         <Wrapper sx={{height: 'calc(100vh - 80px)', padding: 0}}>
@@ -422,7 +424,7 @@ export default function ProductGrid() {
                         onRowDoubleClick={handleDoubleClick}
                         onRowEditStart={handleRowEditStart}//disable edit with dbclick
                         onRowEditStop={handleRowEditStop}//disable edit with dbclick
-                        experimentalFeatures={{ newEditingApi: true }}
+                        experimentalFeatures={{newEditingApi: true}}
                         onRowModesModelChange={model => setRowModesModel(model)}
                         rowModesModel={rowModesModel}
                         components={{

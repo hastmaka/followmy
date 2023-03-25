@@ -7,7 +7,7 @@ import {useNotification} from "../../helper/hooks/Hooks";
 //----------------------------------------------------------------
 
 function GrowTransition(props) {
-    return <Slide {...props} direction="down" />;
+    return <Slide {...props} direction="down"/>;
 }
 
 export default function EzNotification() {
@@ -20,7 +20,7 @@ export default function EzNotification() {
             autoHideDuration={notification.timeout}
             anchorOrigin={{vertical: 'top', horizontal: 'center'}}
             onClose={(e, reason) => {
-                if(!(reason === 'clickaway')) {
+                if (!(reason === 'clickaway')) {
                     clearNotification()
                 } else if (reason === 'escapeKeyDown') {
                     clearNotification()

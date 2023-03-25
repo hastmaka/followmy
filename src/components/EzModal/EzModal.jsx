@@ -10,7 +10,7 @@ import {generalSliceActions} from "../../store/adminSlice";
 //----------------------------------------------------------------
 
 const Transition = forwardRef(function Transition(props, ref) {
-    return <Zoom direction="down"  ref={ref} {...props} />;
+    return <Zoom direction="down" ref={ref} {...props} />;
 });
 
 //----------------------------------------------------------------
