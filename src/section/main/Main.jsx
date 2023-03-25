@@ -273,6 +273,14 @@ export default function Main() {
                             addBtnRef
                         },
                     }}
+                    //style
+                    getRowClassName={(params) => {
+                        debugger
+                    }}
+                    sx={({palette}) => ({
+                        color: palette['white'],
+                        backgroundColor: palette['indigoDye']
+                    })}
                 />
             </Box>
         </RootStyle>

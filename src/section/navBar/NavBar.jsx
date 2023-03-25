@@ -9,7 +9,8 @@ const RootStyle = styled(Stack)(({theme}) => ({
     alignItems: 'center',
     width: '100%',
     height: '60px',
-    borderBottom: '1px solid #e2e2e2'
+    borderBottom: '1px solid #e2e2e2',
+    backgroundColor: theme.palette['white']
 }));
 
 export default function NavBar() {
