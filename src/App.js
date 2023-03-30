@@ -1,15 +1,13 @@
-import {lazy, Suspense, useEffect, useState} from "react";
+import {lazy, Suspense, useEffect, useMemo, useState} from "react";
 import {Route, Routes, useLocation, useNavigate} from "react-router-dom";
-import {Provider} from "react-redux";
-import store from "./store";
+import {useDispatch, useSelector} from "react-redux";
 //
-import ThemeProvider from "./theme";
-import EzNotification from "./components/EzNotification/EzNotification";
-import EzConfirmDialog from "./components/EzConfirmDialog/EzConfirmDialog";
 import Login from "./section/login/Login";
 import Router from "./routes";
 import AppStoreControl from "./AppStoreControl";
 import {addNeededSlices, verifySession} from "./AppController";
+import {useConfirmDialog, useNotification} from "./helper/hooks/Hooks";
+import EzModal from "./components/EzModal/EzModal";
 //dynamic import
 const CreateAccount = lazy(() => import('./section/login/CreateAccount'))
 const ForgotPassword = lazy(() => import('./section/login/ForgotPassword'))
@@ -19,16 +17,31 @@ const ForgotPassword = lazy(() => import('./section/login/ForgotPassword'))
 export default function App() {
     const location = useLocation();
     const navigate = useNavigate();
+    const dispatch = useDispatch();
+    const {confirm} = useConfirmDialog();
+    const {displayNotification} = useNotification();
+    const [children, setChildren] = useState(null);
     const [runApp, setRunApp] = useState(false);
-
+    // debugger
     useEffect(_ => {
         if (!verifySession() && !['/login', '/create-account', '/forgot-password'].includes(location.pathname)) {
             navigate('/login')
         }
-    }, [location])
+    }, [location]);
+
+    useEffect(_ => {
+        window.dispatch = dispatch;
+        window.confirm = confirm;
+        window.setChildren = setChildren;
+        window.displayNotification = displayNotification;
+    }, [])
+
 
     return (
-        <ThemeProvider>
+        <>
+            <Suspense fallback={<div>Loading Login...</div>}>
+                <EzModal children={children}/>
+            </Suspense>
             {!runApp && !verifySession() ?
                 <Routes>
                     <Route path='/login' element={<Login/>}/>
@@ -37,14 +50,17 @@ export default function App() {
                     <Route path='*' to='/login' element={<Login/>}/>
                 </Routes> :
                 runApp ?
-                    <Provider store={store}>
-                        <AppStoreControl>
-                            <Router/>
-                            <EzNotification/>
-                            <EzConfirmDialog/>
-                        </AppStoreControl>
-                    </Provider> :
-                    addNeededSlices(setRunApp)}
-        </ThemeProvider>
+                    <AppStoreControl>
+                        <Router/>
+                    </AppStoreControl> :
+                addNeededSlices(
+                    setRunApp,
+                    dispatch,
+                    confirm,
+                    setChildren,
+                    displayNotification
+                )
+            }
+        </>
     )
 };

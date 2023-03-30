@@ -7,7 +7,8 @@ import {
     getDocs,
     query,
     setDoc,
-    where
+    where,
+    documentId
 } from "firebase/firestore";
 import {db} from "./FirebaseConfig";
 
@@ -56,10 +57,7 @@ export const getById = createAsyncThunk(
             if (!data.data()) {
                 debugger
             }//if the user doesn't exist
-            if (collection === 'product') {
-                return {...data.data(), id: id}
-            }
-            return data.data();
+            return {...data.data(), uid: data.id};
         } catch (error) {
             debugger
             return rejectWithValue(error.response.data);
@@ -67,27 +65,21 @@ export const getById = createAsyncThunk(
     }
 );
 
-export const getAll = createAsyncThunk(
-    'firestore/getAll',
-    async ({collection, filters = [], lim = null}, {rejectWithValue}) => {
-        let queries = [];
-        if (filters.length) {
-            for (const filter of filters) {
-                queries.push(where(filter.field, filter.operator, filter.value));
-            }
-        }
-        let q = query(firestoreCollection(db, collection), ...queries);
+export const getUserTableData = createAsyncThunk(
+    'firestore/getUserTableData',
+    async ({uid}) => {
+        let data = {};
+        const tableDataRef = firestoreCollection(db, `users/${uid}/tableData`);
+        const q = query(tableDataRef, where(documentId(), '==', '03-2023'));
         try {
-            let data = [];
-            let res = await getDocs(q);
-            res.docs.map(doc => {
-                data.push({...doc.data(), id: doc.id});
+            const querySnapshot = await getDocs(q);
+            querySnapshot.docs.map(doc => {
+                data = {...doc.data(), id: doc.id}
             })
-            debugger
             return data
         } catch (error) {
             debugger
-            return rejectWithValue(error.response.data);
+            return error.response.data
         }
     }
 );
@@ -105,6 +97,18 @@ export const getUser = (uid) => {
             reject(err)
         }
     })
+}
+
+export const updateTable = async (uid, data) => {
+
+    const tableDataRef = firestoreCollection(db, `users/${uid}/tableData`);
+    const docRef = doc(tableDataRef, '03-2023');
+    try {
+        await setDoc(docRef, {data: [...data]}, {merge: true})
+    } catch (err) {
+        debugger
+        console.log(err);
+    }
 }
 
 

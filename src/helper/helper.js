@@ -1,5 +1,6 @@
 import {doc, setDoc} from "firebase/firestore";
 import {db} from "./firebase/FirebaseConfig";
+import {generalSliceActions} from "../store/adminSlice";
 
 export const createAccountProcess = async (user) => {
     const tempUser = {
@@ -16,7 +17,13 @@ export const createAccountProcess = async (user) => {
     }
 }
 
-export const loginProcess = () => {
-    debugger
-    return true
+export const loginProcess = ({firebaseUser, dbUser, navigate, from}) => {
+    let tempAccessToken = from === 'google' ? firebaseUser.user.accessToken : firebaseUser.accessToken
+    localStorage.setItem('uid', JSON.stringify(dbUser.uid))
+    window.dispatch(generalSliceActions.setUser({...dbUser, token: tempAccessToken}))
+    window.displayNotification({
+        type: 'success',
+        content: `Welcome ${dbUser.email}`
+    })
+    navigate('/')
 }

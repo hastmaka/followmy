@@ -1,10 +1,10 @@
 // material
 import {Stack} from "@mui/material";
 import {styled} from '@mui/material/styles';
-import {useDispatch} from "react-redux";
-import {useConfirmDialog, useNotification} from "./helper/hooks/Hooks";
-import {Suspense, useEffect, useState} from "react";
-import EzModal from "./components/EzModal/EzModal";
+import {useSelector} from "react-redux";
+import {useEffect} from "react";
+import {generalSliceActions} from "./store/adminSlice";
+import {getById, getUserTableData} from "./helper/firebase/FirestoreApi";
 
 //----------------------------------------------------------------
 
@@ -13,26 +13,19 @@ const RootStyle = styled(Stack)(({theme}) => ({}));
 //----------------------------------------------------------------
 
 export default function AppStoreControl(props) {
-    const dispatch = useDispatch();
-    const {confirm} = useConfirmDialog();
-    const {displayNotification} = useNotification();
-    const [children, setChildren] = useState(null);
-    const [allLoaded, setAllLoaded] = useState(false)
+    const uid = JSON.parse(localStorage.getItem('uid'));
+    const {userStatus, tableDataStatus} = useSelector(slice => slice.admin);
 
     useEffect(_ => {
-        window.dispatch = dispatch;
-        window.confirm = confirm;
-        window.setChildren = setChildren;
-        window.displayNotification = displayNotification;
-        setAllLoaded(true)
-    }, [])
+        if(!userStatus.loaded)
+        window.dispatch(getById({id: uid, collection: 'users'}))
+        window.dispatch(getUserTableData({uid}))
+    }, [userStatus.loaded])
+
 
     return (
         <RootStyle>
-            {allLoaded && props.children}
-            <Suspense fallback={<div>Loading Login...</div>}>
-                <EzModal children={children}/>
-            </Suspense>
+            {userStatus.loaded && tableDataStatus.loaded && props.children}
         </RootStyle>
     );
 }

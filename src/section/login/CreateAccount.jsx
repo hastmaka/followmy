@@ -18,7 +18,6 @@ export default function CreateAccount() {
     const location = useLocation();
     const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
-    const [notification, setNotification] = useState({type: '', message: ''})
     // debugger
 
     const onCreateAccountSubmit = async (e) => {
@@ -28,24 +27,35 @@ export default function CreateAccount() {
             password = data.get('password'),
             confirmPassword = data.get('confirmPassword');
         if(password !== confirmPassword) {
-            setNotification({type: 'error', message: `Password doesn't match`})
+            return window.displayNotification({
+                type: 'warning',
+                content: `Password doesn't match, double check Caps Lock`
+            })
         } else if (password.length < 6) {
-            setNotification({type: 'error', message: `Password min length is 6 character`})
+            return window.displayNotification({
+                type: 'warning',
+                content: `Password has to be at least 6 characters`
+            })
         } else {
             setLoading(true)
             const user = await import('../../helper/firebase/FirebaseAuthService').then(module => {
                 return module.registerUser(email, password)
             })
-            if(user?.type === 'error') {
-                setNotification({type: 'error', message: user.content})
-            } else {
+            if(!!user) {
                 const dbUser = await import('../../helper').then(module => {
                     return module.createAccountProcess(user)
                 });
                 if(dbUser === 'created') {
-                    navigate('/login', {state: {type: 'success',message: `User created Successfully`}})
+                    window.displayNotification({
+                        type: 'success',
+                        content: 'Account created successfully, now can Sign in'
+                    });
+                    navigate('/login')
                 } else {
-                    setNotification({type: 'error',message: `Error while creating the account`})
+                    window.displayNotification({
+                        type: 'info',
+                        content: 'Error while creating the account'
+                    })
                 }
             }
             setLoading(false)
@@ -55,17 +65,6 @@ export default function CreateAccount() {
     return (
         <LoginWrapper>
             <EzText text='Sign up' variant='h4' sx={{textAlign: 'center', margin: '0 20px 10px 20px', fontSize: '1.5rem'}}/>
-            {!!notification.type &&
-                <EzText
-                    text={notification.message}
-                    sx={{
-                        color: notification.type === 'error' ? 'red' : 'green',
-                        textAlign: 'center',
-                        margin: '0 0 10px 0',
-                        fontSize: '0.8rem'
-                    }}
-                />
-            }
             <Box component='form' onSubmit={onCreateAccountSubmit}>
                 <EzTextField required type='email' name='email' label='Email address' autoFocus/>
                 <EzTextField

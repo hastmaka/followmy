@@ -19,7 +19,7 @@ export default function NavBar() {
         <RootStyle>
             <NavLink to={'/'}>Home</NavLink>
             <Button onClick={_ => {
-                localStorage.removeItem('token')
+                localStorage.removeItem('uid')
                 navigate('/login')
                 window.location.reload()
             }}>Log Out</Button>

@@ -1,69 +1,32 @@
+import {useCallback, useMemo, useRef, useState} from "react";
+import {useSelector} from "react-redux";
 // material
-import {Box, Stack, Tooltip} from "@mui/material";
+import {Box, MenuItem, Select, Stack, Tooltip} from "@mui/material";
 import {styled} from '@mui/material/styles';
 import {DataGrid, GridActionsCellItem, GridRowModes} from '@mui/x-data-grid';
-import {useCallback, useEffect, useMemo, useRef, useState} from "react";
-import Toolbar from "./ToolBar";
-import {checkValidFields} from "../../helper/checkValidFields";
 import SaveIcon from "@mui/icons-material/Save";
 import CancelIcon from "@mui/icons-material/Cancel";
 import EditIcon from "@mui/icons-material/Edit";
+//
+import Toolbar from "./ToolBar";
+import {checkValidFields} from "../../helper/checkValidFields";
 import EzText from "../../components/EzText/EzText";
-import {useLocation} from "react-router-dom";
 import {generalSliceActions} from "../../store/adminSlice";
+import {monthDays} from "../../helper";
+import {CustomSelectCell} from "./CustomSelectCell";
 
 const RootStyle = styled(Stack)(({theme}) => ({
     margin: '10px',
     height: 'calc(100vh - 80px)'
 }));
 
-const tempRows = [
-    {
-        id: 1,
-        date: new Date('3/21/2023'),
-        uber: 50,
-        lyft: 246,
-        other: 100,
-        miles: 124,
-        hours: 6,
-        gas: 0,
-        expenses: 14,
-        dollarsPerHour: 33
-    },
-    {
-        id: 3,
-        date: new Date('3/23/2023'),
-        uber: 50,
-        lyft: 246,
-        other: 100,
-        miles: 124,
-        hours: 6,
-        gas: 0,
-        expenses: 14,
-        dollarsPerHour: 33
-    },
-    {
-        id: 2,
-        date: new Date('3/22/2023'),
-        uber: 50,
-        lyft: 246,
-        other: 100,
-        miles: 124,
-        hours: 6,
-        gas: 0,
-        expenses: 14,
-        dollarsPerHour: 33
-    },
-];
+
+
 
 export default function Main() {
-    const location = useLocation();
-    useEffect(_ => {
-        if(!!location.state)
-        window.dispatch(generalSliceActions.setUser(location.state))
-    }, [location.state])
-
-    const [rows, setRows] = useState([...tempRows]);
+    const {user} = useSelector(slice => slice.admin);
+    const [rows, setRows] = useState([...user.tableData.data]);
+    const daysToRender = useMemo(() => monthDays(user.tableData.id), [user.tableData.id])
     const addBtnRef = useRef();
     const [rowModesModel, setRowModesModel] = useState({});
 
@@ -89,11 +52,20 @@ export default function Main() {
             {
                 field: 'date',
                 headerName: 'date',
-                type: 'date',
+                type: 'singleSelect',
                 flex: 1,
+                minWidth: 180,
                 editable: true,
                 align: 'center',
                 headerAlign: 'center',
+                renderEditCell: (params) => (
+                    <CustomSelectCell
+                        options={daysToRender}
+                        value={params.value}
+                        api={params.api}
+                        id={params.id}
+                    />
+                ),
             },
             {
                 field: 'uber',
@@ -182,7 +154,6 @@ export default function Main() {
                 sortable: false,
                 getActions: (params) => {
                     const isInEditMode = rowModesModel[params.id]?.mode === GridRowModes.Edit;
-                    // debugger
                     if (isInEditMode) {
                         return [
                             <GridActionsCellItem
@@ -237,16 +208,18 @@ export default function Main() {
             if (JSON.stringify(newRow) === JSON.stringify(oldRow)) {
                 return oldRow
             } else {
-                //updateProductApi(newRow.id, newRow)
-                return newRow
+                if(newRow.isNew) {
+                    const {isNew, ...rest} = newRow;
+                    window.dispatch(generalSliceActions.createNewRecordInUserTable({...rest}))
+                    return rest
+                } else {
+                    window.dispatch(generalSliceActions.updateUserTable(newRow))
+                    return newRow
+                }
             }
         }, []
     );
-    //how many hour
-    //how much u earn
-    //fuel
-    //other expenses
-    //day - weekly - monthly
+
     return (
         <RootStyle>
             <Box sx={{height: '100%', width: '100%'}}>
@@ -255,6 +228,7 @@ export default function Main() {
                     columns={allProductsVariantsGridColumns}
                     pageSize={10}
                     rowsPerPageOptions={[10, 20]}
+                    sortingOrder={['asc']}
                     processRowUpdate={processRowUpdate}
                     onProcessRowUpdateError={handleProcessRowUpdateError}
                     checkboxSelection
@@ -270,7 +244,8 @@ export default function Main() {
                             setRows,
                             rowModesModel,
                             setRowModesModel,
-                            addBtnRef
+                            addBtnRef,
+                            user
                         },
                     }}
                     //style

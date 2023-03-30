@@ -18,21 +18,23 @@ const RootStyle = styled(Stack)(({theme}) => ({
     justifyContent: 'space-between'
 }));
 
-export default function Toolbar({setRows, setRowModesModel, addBtnRef}) {
+export default function Toolbar({setRows, setRowModesModel, addBtnRef, user}) {
     const handleAddRow = async () => {
         const id = createId(20);
-        setRows(prev => [{
-            id,
-            date: new Date(),
-            uber: 0,
-            lyft: 0,
-            other: 0,
-            hours: 0,
-            miles: 0,
-            gas: 0,
-            expenses: 0,
-            isNew: true
-        }, ...prev]);
+        setRows(prev => {
+            return [{
+                id,
+                date: (Math.max(...user.tableData.data.map(item => item.date)) + 1).toString().padStart(2, '0'),
+                uber: 0,
+                lyft: 0,
+                other: 0,
+                hours: 0,
+                miles: 0,
+                gas: 0,
+                expenses: 0,
+                isNew: true
+            }, ...prev]
+        });
         setRowModesModel(prev => {
             return {
                 ...prev,

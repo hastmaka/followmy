@@ -17,15 +17,15 @@ export const registerUser = async (email, password) => {
         }).catch(e => {
             switch (e.code) {
                 case 'auth/email-already-in-use':
-                    return {
+                    return window.displayNotification({
                         type: 'error',
                         content: 'Email already in use, please choose another one'
-                    };
+                    });
                 default:
-                    return {
+                    return window.displayNotification({
                         type: 'error',
                         content: 'Internal Error'
-                    }
+                    });
             }
         })
 };
@@ -37,13 +37,27 @@ export const loginUser = async (email, password) => {
         }).catch(e => {
             switch (e.code) {
                 case 'auth/wrong-password':
-                    return {type: 'error', content: 'Wrong Password, Double check Caps'}
+                    return window.displayNotification({
+                        type: 'error',
+                        content: 'Wrong Password, Double check Caps'
+                    });
                 case 'auth/user-not-found':
-                    return {type: 'error', content: 'User not Found', important: true}
+                    return window.displayNotification({
+                        type: 'error',
+                        content: 'User not Found',
+                        important: true
+                    });
                 case 'auth/too-many-requests':
-                    return {type: 'error', content: 'Too many request was made, try again later'}
+                    return window.displayNotification({
+                        type: 'error',
+                        content: 'Too many request was made, try again later',
+                        important: true
+                    });
                 default:
-                    return {type: 'error', content: 'Firebase Unknown Error'}
+                    return window.displayNotification({
+                        type: 'error',
+                        content: 'Firebase Unknown Error'
+                    })
             }
         })
 }
@@ -62,7 +76,7 @@ export const loginWithGoogle = () => {
 }
 
 export const subscribeToAuthChanges = (user) => {
-    onAuthStateChanged(auth, async _ => {
+    onAuthStateChanged(auth, _ => {
         try {
             window.dispatch(getById({id: user.uid, collection: 'users'}))
         } catch (err) {
