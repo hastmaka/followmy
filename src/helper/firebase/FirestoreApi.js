@@ -100,7 +100,6 @@ export const getUser = (uid) => {
 }
 
 export const updateTable = async (uid, data) => {
-
     const tableDataRef = firestoreCollection(db, `users/${uid}/tableData`);
     const docRef = doc(tableDataRef, '03-2023');
     try {

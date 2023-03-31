@@ -1,4 +1,4 @@
-import {useCallback, useMemo, useRef, useState} from "react";
+import {useCallback, useEffect, useMemo, useRef, useState} from "react";
 import {useSelector} from "react-redux";
 // material
 import {Box, MenuItem, Select, Stack, Tooltip} from "@mui/material";
@@ -25,10 +25,16 @@ const RootStyle = styled(Stack)(({theme}) => ({
 
 export default function Main() {
     const {user} = useSelector(slice => slice.admin);
-    const [rows, setRows] = useState([...user.tableData.data]);
+    const [rows, setRows] = useState([]);
     const daysToRender = useMemo(() => monthDays(user.tableData.id), [user.tableData.id])
     const addBtnRef = useRef();
     const [rowModesModel, setRowModesModel] = useState({});
+
+    useEffect(_ => {
+        if(user.tableData?.data?.length)
+        setRows(user.tableData.data)
+    }, [user.tableData.data])
+
 
     const handleEditClick = useCallback((id) => {
         setRowModesModel({...rowModesModel, [id]: {mode: GridRowModes.Edit}})
@@ -46,6 +52,10 @@ export default function Main() {
             setRows(prev => prev.filter(item => item.id !== id))
         }
     }, [rowModesModel]);
+
+    const handleCellDoubleClick = (params, event) => {
+        event.preventDefault();
+    }
 
     const allProductsVariantsGridColumns = useMemo(
         () => [
@@ -157,12 +167,12 @@ export default function Main() {
                     if (isInEditMode) {
                         return [
                             <GridActionsCellItem
-                                icon={<SaveIcon/>}
+                                icon={<SaveIcon sx={{fill: 'green'}}/>}
                                 label="Save"
                                 onClick={_ => handleSaveClick(params.id)}
                             />,
                             <GridActionsCellItem
-                                icon={<CancelIcon/>}
+                                icon={<CancelIcon sx={{fill: 'red'}}/>}
                                 label="Cancel"
                                 className="textPrimary"
                                 onClick={_ => handleCancelClick(params.id)}
@@ -228,7 +238,10 @@ export default function Main() {
                     columns={allProductsVariantsGridColumns}
                     pageSize={10}
                     rowsPerPageOptions={[10, 20]}
-                    sortingOrder={['asc']}
+
+                    editMode="row"
+                    onCellDoubleClick={handleCellDoubleClick}
+
                     processRowUpdate={processRowUpdate}
                     onProcessRowUpdateError={handleProcessRowUpdateError}
                     checkboxSelection

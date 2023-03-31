@@ -4,7 +4,11 @@ import {getById, getUserTableData, updateTable} from "../helper/firebase/Firesto
 const adminSlice = createSlice({
     name: 'admin',
     initialState: {
-        user: {},
+        user: {
+            tableData: {
+                data: []
+            }
+        },
         modal: {
             open: false,
             who: null
@@ -32,12 +36,12 @@ const adminSlice = createSlice({
         },
         createNewRecordInUserTable(state, {payload}) {
             state.user.tableData.data = [...state.user.tableData.data, payload]
-            updateTable(state.user.uid, state.user.tableData.data)
+            updateTable(state.user.uid, state.user.tableData.data).then()
         },
         updateUserTable(state, {payload}) {
             const indexTpUpdate = state.user.tableData.data.findIndex(item => item.id === payload.id)
             state.user.tableData.data[indexTpUpdate] = payload
-            updateTable(state.user.uid, state.user.tableData.data)
+            updateTable(state.user.uid, state.user.tableData.data).then()
         },
         openModal(state, {payload}) {
             state.modal.open = true;

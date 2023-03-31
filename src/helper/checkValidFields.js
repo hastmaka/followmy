@@ -1,3 +1,5 @@
+import PropTypes from "prop-types";
+
 export const checkValidFields = (obj) => {
     for (let key in obj) {
         if (obj.hasOwnProperty(key)) {
@@ -10,4 +12,8 @@ export const checkValidFields = (obj) => {
         }
     }
     return true;
+}
+
+checkValidFields.prototype = {
+    obj: PropTypes.object.isRequired
 }

@@ -22,9 +22,11 @@ export default function Toolbar({setRows, setRowModesModel, addBtnRef, user}) {
     const handleAddRow = async () => {
         const id = createId(20);
         setRows(prev => {
-            return [{
+            return [...prev, {
                 id,
-                date: (Math.max(...user.tableData.data.map(item => item.date)) + 1).toString().padStart(2, '0'),
+                date: !user.tableData?.data?.length ?
+                    new Date().toLocaleDateString().split('/')[1].toString().padStart(2, '0') :
+                    (Math.max(...user.tableData.data.map(item => item.date)) + 1).toString().padStart(2, '0'),
                 uber: 0,
                 lyft: 0,
                 other: 0,
@@ -33,7 +35,7 @@ export default function Toolbar({setRows, setRowModesModel, addBtnRef, user}) {
                 gas: 0,
                 expenses: 0,
                 isNew: true
-            }, ...prev]
+            }]
         });
         setRowModesModel(prev => {
             return {
