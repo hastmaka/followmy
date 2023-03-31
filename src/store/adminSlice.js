@@ -9,6 +9,7 @@ const adminSlice = createSlice({
                 data: []
             }
         },
+        month: [],
         modal: {
             open: false,
             who: null
@@ -35,13 +36,23 @@ const adminSlice = createSlice({
             state.userStatus.loaded = true;
         },
         createNewRecordInUserTable(state, {payload}) {
-            state.user.tableData.data = [...state.user.tableData.data, payload]
-            updateTable(state.user.uid, state.user.tableData.data).then()
+            state.user.tableData.data = [...state.user.tableData.data, payload.newR]
+            updateTable(
+                state.user.uid,
+                state.user.tableData.data,
+                payload.collection,
+                state.user.tableData.id
+            ).then()
         },
         updateUserTable(state, {payload}) {
-            const indexTpUpdate = state.user.tableData.data.findIndex(item => item.id === payload.id)
-            state.user.tableData.data[indexTpUpdate] = payload
-            updateTable(state.user.uid, state.user.tableData.data).then()
+            const indexTpUpdate = state.user.tableData.data.findIndex(item => item.id === payload.newRow.id)
+            state.user.tableData.data[indexTpUpdate] = {...payload.newRow}
+            updateTable(
+                state.user.uid,
+                state.user.tableData.data,
+                payload.collection,
+                state.user.tableData.id
+            ).then()
         },
         openModal(state, {payload}) {
             state.modal.open = true;
@@ -81,24 +92,11 @@ const adminSlice = createSlice({
     },
     extraReducers: (builder) => {
         builder.addCase(getById.pending, (state, {meta}) => {
-            switch (meta.arg.collection) {
-                case 'users':
-                    state.userStatus.loading = true;
-                    break;
-                default:
-                    return;
-            }
+            state.userStatus.loading = true;
         });
         builder.addCase(getById.fulfilled, (state, {payload, meta}) => {
-            switch (meta.arg.collection) {
-                case 'users':
-                    state.user = {...payload}
-                    state.userStatus.loaded = true;
-                    break;
-                default:
-                    return;
-            }
-
+            state.user = {...payload}
+            state.userStatus.loaded = true;
         });
         builder.addCase(getById.rejected, (state, {meta, payload}) => {
             state.message = payload;
@@ -109,7 +107,8 @@ const adminSlice = createSlice({
             state.tableDataStatus.loading = true;
         });
         builder.addCase(getUserTableData.fulfilled, (state, {payload, meta}) => {
-            state.user.tableData = {...payload}
+            state.user.tableData = {...payload.data}
+            state.month = [...payload.documentIds]
             state.tableDataStatus.loaded = true;
         });
         builder.addCase(getUserTableData.rejected, (state, {meta, payload}) => {

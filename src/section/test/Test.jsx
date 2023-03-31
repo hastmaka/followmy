@@ -1,6 +1,8 @@
 // material
-import {Stack} from "@mui/material";
+import {FormControl, InputLabel, MenuItem, Select, Stack} from "@mui/material";
 import {styled} from '@mui/material/styles';
+import {useState} from "react";
+import EzCustomSelect from "../../components/EzCustomSelect/EzCustomSelect";
 
 //----------------------------------------------------------------
 
@@ -12,12 +14,24 @@ const RootStyle = styled(Stack)(({theme}) => ({
 
 //----------------------------------------------------------------
 
-export default function Test() {
+export default function Test(props) {
+    const [value, setValue] = useState('test')
     return (
-        <RootStyle>
-            test
-        </RootStyle>
-    );
+        <EzCustomSelect
+            option={[
+                {
+                    value: 'test',
+                    label: 'Test'
+                },
+                {
+                    value: 'test_1',
+                    label: "Test 1"
+                }
+            ]}
+            value={value}
+            onChange={e => setValue(e.target.value)}
+        />
+    )
 }
 
 // import './Test.css'

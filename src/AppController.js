@@ -7,5 +7,5 @@ export const addNeededSlices = (setRunApp, dispatch, confirm, setChildren, displ
 }
 
 export const verifySession = () => {
-    return (JSON.parse(localStorage.getItem('uid')));
+    return (JSON.parse(localStorage.getItem('user')));
 }

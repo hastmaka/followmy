@@ -13,6 +13,7 @@ import EzTextField from "../../components/EzTextField/EzTextField";
 import EzText from "../../components/EzText/EzText";
 import {btnOutlined} from "../../helper/Style";
 import {loginProcess} from "../../helper";
+import EzCustomSelect from "../../components/EzCustomSelect/EzCustomSelect";
 
 //dynamic import
 
@@ -22,6 +23,7 @@ export default function Login() {
     const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
     const [googleBtnLoading, setGoogleBtnLoading] = useState(false);
+    const [selectedValue, setSelectedValue] = useState('uber_and_lyft')
 
     const onLoginWithGoogle = async () => {
         setGoogleBtnLoading(true);
@@ -66,11 +68,24 @@ export default function Login() {
         const firebaseUser = await import('../../helper/firebase/FirebaseAuthService').then(module => {
             return module.loginUser(email, password)
         });
-        if(!!firebaseUser) {
+        if(firebaseUser) {
             const dbUser = await import('../../helper/firebase/FirestoreApi').then(module => {
-                return module.getUser(firebaseUser.uid)
+                return module.getUser(firebaseUser.uid, selectedValue)
             });
-            loginProcess({firebaseUser, dbUser, navigate, from: 'emailAndPass'})
+            if(!dbUser) {
+                window.displayNotification({
+                    type: 'error',
+                    content: 'Please Check Account Type'
+                })
+            } else {
+                loginProcess({
+                    firebaseUser,
+                    dbUser,
+                    navigate,
+                    from: 'emailAndPass',
+                    selectedValue
+                })
+            }
         }
         setLoading(false);
     }
@@ -102,6 +117,17 @@ export default function Login() {
                             </InputAdornment>
                         ),
                     }}
+                />
+                <EzCustomSelect
+                    option={[{
+                        label: 'Uber and Lyft',
+                        value: 'uber_and_lyft'
+                    }, {
+                        label: 'Personal',
+                        value: 'personal'
+                    }]}
+                    value={selectedValue}
+                    onChange={e => setSelectedValue(e.target.value)}
                 />
                 <EzLoadingBtn
                     sx={{marginTop: '25px'}}

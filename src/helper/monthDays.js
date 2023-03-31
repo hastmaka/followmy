@@ -24,7 +24,7 @@ export const monthDays = (id) => {
     if(id) {
         const month = +id.split('-')[0],
             days = [];
-        for (let i = 1; i < daysInMonth[month]; i++) {
+        for (let i = 1; i <= daysInMonth[month]; i++) {
             days.push(i.toString().padStart(2, '0'))
         }
         return days

@@ -10,12 +10,13 @@ import EzLoadingBtn from "../../components/EzLoadingBtn/EzLoadingBtn";
 import EzTextField from "../../components/EzTextField/EzTextField";
 import EzButton from "../../components/EzButton/EzButton";
 import EzText from "../../components/EzText/EzText";
+import EzCustomSelect from "../../components/EzCustomSelect/EzCustomSelect";
 
 //----------------------------------------------------------------
 
 export default function CreateAccount() {
     const navigate = useNavigate();
-    const location = useLocation();
+    const [selectedValue, setSelectedValue] = useState('uber_and_lyft')
     const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
     // debugger
@@ -43,7 +44,7 @@ export default function CreateAccount() {
             })
             if(!!user) {
                 const dbUser = await import('../../helper').then(module => {
-                    return module.createAccountProcess(user)
+                    return module.createAccountProcess({user, selectedValue})
                 });
                 if(dbUser === 'created') {
                     window.displayNotification({
@@ -107,7 +108,17 @@ export default function CreateAccount() {
                         ),
                     }}
                 />
-
+                <EzCustomSelect
+                    option={[{
+                        label: 'Uber and Lyft',
+                        value: 'uber_and_lyft'
+                    }, {
+                        label: 'Personal',
+                        value: 'personal'
+                    }]}
+                    value={selectedValue}
+                    onChange={e => setSelectedValue(e.target.value)}
+                />
                 <EzLoadingBtn
                     sx={{marginTop: '25px'}}
                     fullWidth

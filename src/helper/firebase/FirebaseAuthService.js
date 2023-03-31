@@ -6,9 +6,11 @@ import {
     sendPasswordResetEmail,
     signInWithEmailAndPassword,
     signInWithPopup,
-    signOut
+    signOut,
+    getIdToken
 } from 'firebase/auth';
-import {getById} from "./FirestoreApi";
+import {getById, getUser} from "./FirestoreApi";
+import {generalSliceActions} from "../../store/adminSlice";
 
 export const registerUser = async (email, password) => {
     return await createUserWithEmailAndPassword(auth, email, password)
@@ -75,10 +77,12 @@ export const loginWithGoogle = () => {
     return signInWithPopup(auth, provider);
 }
 
-export const subscribeToAuthChanges = (user) => {
-    onAuthStateChanged(auth, _ => {
+export const subscribeToAuthChanges = (select) => {
+    onAuthStateChanged(auth, async firebaseUser => {
+        let token = await getIdToken(firebaseUser);
         try {
-            window.dispatch(getById({id: user.uid, collection: 'users'}))
+            const user = await getUser(firebaseUser.uid, select);
+            window.dispatch(generalSliceActions.setUser({...user, token, select}))
         } catch (err) {
             console.log(err);
         }
