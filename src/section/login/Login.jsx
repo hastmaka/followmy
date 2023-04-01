@@ -128,6 +128,7 @@ export default function Login() {
                     }]}
                     value={selectedValue}
                     onChange={e => setSelectedValue(e.target.value)}
+                    from='login'
                 />
                 <EzLoadingBtn
                     sx={{marginTop: '25px'}}

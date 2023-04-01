@@ -33,3 +33,17 @@ export const linkStyle = {
         borderBottom: `1px solid ${'#999'}`,
     }
 }
+
+export const ezCustomSelectSx = (from) => {
+    if(from === 'toolbar') {
+        return {
+            color: 'white',
+            '& .MuiSvgIcon-root': {
+                fill: 'white'
+            },
+            '& .MuiOutlinedInput-notchedOutline': {
+                borderColor: 'transparent'
+            }
+        }
+    }
+}

@@ -1,37 +1,22 @@
 // material
 import {MenuItem, Select, Stack} from "@mui/material";
-import {styled} from '@mui/material/styles';
 import PropTypes from "prop-types";
+import {ezCustomSelectSx} from "../../helper/Style";
 
-//----------------------------------------------------------------
-
-const RootStyle = styled(Stack)(({theme}) => ({}));
-
-//----------------------------------------------------------------
-
-export default function EzCustomSelect({option, value, onChange, from = null, ...rest}) {
-
+export default function EzCustomSelect({option, value, onChange, from, ...rest}) {
     return (
         <Select
             value={value}
             onChange={onChange}
             {...rest}
-            sx={{
-                color: 'white',
-                '& .MuiSvgIcon-root': {
-                    fill: 'white'
-                },
-                '& .MuiOutlinedInput-notchedOutline': {
-                    borderColor: 'transparent'
-                }
-            }}
+            sx={{...ezCustomSelectSx(from)}}
         >
             {option.map((option) =>
                 <MenuItem
-                    key={!!from ? option.value : option}
-                    value={!!from ? option.value : option}
+                    key={from === 'toolbar' ? option : option.value}
+                    value={from === 'toolbar' ? option : option.value}
                 >
-                    {!!from ? option.label : option}
+                    {from === 'toolbar' ? option : option.label}
                 </MenuItem>
             )}
         </Select>
@@ -41,5 +26,6 @@ export default function EzCustomSelect({option, value, onChange, from = null, ..
 EzCustomSelect.prototype = {
     option: PropTypes.array.isRequired,
     value: PropTypes.string.isRequired,
+    from: PropTypes.string.isRequired,
     onChange: PropTypes.func.isRequired
 }

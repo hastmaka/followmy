@@ -118,6 +118,7 @@ export default function CreateAccount() {
                     }]}
                     value={selectedValue}
                     onChange={e => setSelectedValue(e.target.value)}
+                    from='create-account'
                 />
                 <EzLoadingBtn
                     sx={{marginTop: '25px'}}
