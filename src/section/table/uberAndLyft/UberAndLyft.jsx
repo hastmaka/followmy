@@ -1,21 +1,22 @@
-import {useCallback, useEffect, useMemo, useRef, useState} from "react";
-import {useSelector} from "react-redux";
+import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import {useSelector} from 'react-redux';
 // material
-import {Box, Stack, Tooltip} from "@mui/material";
+import {Box, Stack, Tooltip} from '@mui/material';
 import {styled} from '@mui/material/styles';
 import {DataGrid, GridActionsCellItem, GridRowModes} from '@mui/x-data-grid';
-import SaveIcon from "@mui/icons-material/Save";
-import CancelIcon from "@mui/icons-material/Cancel";
-import EditIcon from "@mui/icons-material/Edit";
+import SaveIcon from '@mui/icons-material/Save';
+import CancelIcon from '@mui/icons-material/Cancel';
+import EditIcon from '@mui/icons-material/Edit';
 //
-import Toolbar from "./ToolBar";
-import {checkValidFields} from "../../../helper/checkValidFields";
-import EzText from "../../../components/EzText/EzText";
-import {generalSliceActions} from "../../../store/adminSlice";
-import {monthDays} from "../../../helper";
-import {CustomSelectCell} from "../CustomSelectCell";
-import {tableSx} from "../../../helper/Style";
-import EzMuiGrid from "../../../components/EzMuiGrid/EzMuiGrid";
+import Toolbar from './ToolBar';
+import Footer from './Footer';
+import {checkValidFields} from '../../../helper/checkValidFields';
+import EzText from '../../../components/EzText/EzText';
+import {generalSliceActions} from '../../../store/adminSlice';
+import {monthDays} from '../../../helper';
+import {CustomSelectCell} from '../CustomSelectCell';
+import {tableSx} from '../../../helper/Style';
+import EzMuiGrid from '../../../components/EzMuiGrid/EzMuiGrid';
 
 //-----------------------------------------------------------------------
 
@@ -25,7 +26,6 @@ const RootStyle = styled(Stack)(({theme}) => ({
 }));
 
 //-----------------------------------------------------------------------
-
 export default function UberAndLyft() {
     const {user} = useSelector(slice => slice.admin);
     const [rows, setRows] = useState([]);
@@ -252,23 +252,23 @@ export default function UberAndLyft() {
                         return [
                             <GridActionsCellItem
                                 icon={<SaveIcon sx={{fill: 'green'}}/>}
-                                label="Save"
+                                label='Save'
                                 onClick={_ => handleSaveClick(params.id)}
                             />,
                             <GridActionsCellItem
                                 icon={<CancelIcon sx={{fill: 'red'}}/>}
-                                label="Cancel"
-                                className="textPrimary"
+                                label='Cancel'
+                                className='textPrimary'
                                 onClick={_ => handleCancelClick(params.id)}
-                                color="inherit"
+                                color='inherit'
                             />,
                         ];
                     }
                     return [
-                        <Tooltip title="Edit">
+                        <Tooltip title='Edit'>
                             <GridActionsCellItem
                                 icon={<EditIcon sx={{fill: 'white'}}/>}
-                                label="Edit"
+                                label='Edit'
                                 disabled={isInEditMode === true}
                                 onClick={_ => handleEditClick(params.id)}
                                 // showInMenu
@@ -290,7 +290,8 @@ export default function UberAndLyft() {
                     setRowModesModel={setRowModesModel}
                     rowModesModel={rowModesModel}
                     components={{
-                        Toolbar: Toolbar
+                        Toolbar: Toolbar,
+                        Footer: Footer
                     }}
                     componentsProps={{
                         toolbar: {
@@ -300,6 +301,9 @@ export default function UberAndLyft() {
                             setRowModesModel,
                             user
                         },
+                        footer: {
+                            rows
+                        }
                     }}
                     disableSelectionOnClick
                     sx={({palette}) => tableSx(palette)}

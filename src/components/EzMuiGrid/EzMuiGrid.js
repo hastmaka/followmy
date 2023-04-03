@@ -3,7 +3,7 @@ import {DataGrid} from "@mui/x-data-grid";
 
 //----------------------------------------------------------------
 const tableSx = {
-    borderRadius: '24px',
+    borderRadius: '4px',
     border: '1px solid lightgrey'
 };
 

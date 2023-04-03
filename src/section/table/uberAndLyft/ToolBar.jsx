@@ -11,9 +11,11 @@ import EzCustomSelect from "../../../components/EzCustomSelect/EzCustomSelect";
 import {getUserTableData} from "../../../helper/firebase/FirestoreApi";
 import {useState} from "react";
 
+//---------------------------------------------------------------------------------
+
 const RootStyle = styled(Stack)(({theme}) => ({
     height: '60px',
-    border: '1px solid #e2e2e2',
+    border: `1px solid ${theme.palette['tableBorder']}`,
     backgroundColor: theme.palette['indigoDye'],
     borderRadius: '4px 4px 0 0',
     flexDirection: 'row',
@@ -21,6 +23,8 @@ const RootStyle = styled(Stack)(({theme}) => ({
     padding: '0 10px',
     justifyContent: 'space-between'
 }));
+
+//---------------------------------------------------------------------------------
 
 export default function Toolbar({setRows, isAdd, setIsAdd, setRowModesModel, user}) {
     const {month} = useSelector(slice => slice.admin)

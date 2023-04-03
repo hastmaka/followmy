@@ -13,7 +13,9 @@ const palette = {
 
     tableBg: '#222',
     tableColor: '#fff',
-    tableBorder: '#d9d9d921'
+    tableBorder: '#d9d9d921',
+    tableBCCellInEditingMode: '#525252',
+    tableBCActionCellInEditingMode: '#ececec',
 }
 
 export default palette;

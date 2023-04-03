@@ -61,6 +61,21 @@ export const tableSx = (palette) => {
             '& * svg': {
                 fill: palette['tableColor']
             }
-        }
+        },
+        '& .MuiDataGrid-cell, & .MuiDataGrid-columnHeaders': {
+            borderBottom: `1px solid ${palette['tableBorder']}`
+        },
+        '& .MuiDataGrid-row--editing': {
+            '& .MuiDataGrid-cell': {
+                backgroundColor: palette['tableBCCellInEditingMode'],
+
+                '& .MuiInputBase-input': {
+                    color: palette['tableColor'],
+                }
+            },
+            '& div[data-field="action"]': {
+                backgroundColor: palette['tableBCActionCellInEditingMode']
+            }
+        },
     }
 }
