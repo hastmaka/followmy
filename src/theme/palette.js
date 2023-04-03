@@ -10,6 +10,10 @@ const palette = {
     white: '#ffffffff',
     platinum: '#d9d9d9ff',
     indigoDye: '#284b63ff',
+
+    tableBg: '#222',
+    tableColor: '#fff',
+    tableBorder: '#d9d9d921'
 }
 
 export default palette;

@@ -31,7 +31,12 @@ export const loginProcess = ({firebaseUser, dbUser, navigate, from, selectedValu
         type: 'success',
         content: `Welcome ${dbUser.email}`
     })
-    navigate('/')
+    navigate(`/${selectedValue}`)
 }
 
 
+export const logOut = (navigate) => {
+    localStorage.removeItem('user')
+    navigate('/login')
+    window.location.reload()
+}

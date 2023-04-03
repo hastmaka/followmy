@@ -35,7 +35,7 @@ export const linkStyle = {
 }
 
 export const ezCustomSelectSx = (from) => {
-    if(from === 'toolbar') {
+    if (from === 'toolbar') {
         return {
             color: 'white',
             '& .MuiSvgIcon-root': {
@@ -43,6 +43,23 @@ export const ezCustomSelectSx = (from) => {
             },
             '& .MuiOutlinedInput-notchedOutline': {
                 borderColor: 'transparent'
+            }
+        }
+    }
+}
+
+export const tableSx = (palette) => {
+    return {
+        color: palette['tableColor'],
+        backgroundColor: palette['tableBg'],
+        border: `1px solid ${palette['tableBorder']}`,
+        '& .MuiDataGrid-footerContainer': {
+            borderTop: `1px solid ${palette['tableBorder']}`,
+        },
+        '& .MuiTablePagination-toolbar': {
+            color: palette['tableColor'],
+            '& * svg': {
+                fill: palette['tableColor']
             }
         }
     }

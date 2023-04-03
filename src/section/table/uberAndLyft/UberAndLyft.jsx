@@ -14,6 +14,8 @@ import EzText from "../../../components/EzText/EzText";
 import {generalSliceActions} from "../../../store/adminSlice";
 import {monthDays} from "../../../helper";
 import {CustomSelectCell} from "../CustomSelectCell";
+import {tableSx} from "../../../helper/Style";
+import EzMuiGrid from "../../../components/EzMuiGrid/EzMuiGrid";
 
 //-----------------------------------------------------------------------
 
@@ -33,7 +35,34 @@ export default function UberAndLyft() {
 
     useEffect(_ => {
         setRows(user.tableData.data)
-    }, [user.tableData.id])
+    }, [user.tableData.id]);
+
+    // useEffect(_ => {
+    //     if (Object.keys(rowModesModel).length > 0) {
+    //         document.addEventListener('click', handleClickOutsideRow);
+    //     }
+    //     // Remove the event listener when a row is not in edit mode
+    //     return () => {
+    //         document.removeEventListener('click', handleClickOutsideRow);
+    //     };
+    // }, [rowModesModel])
+    //
+    //
+    // const handleClickOutsideRow = useCallback((event) => {
+    //     // Check if the click event target is inside the MUI Data Grid
+    //     // const insideDataGrid = event.target.closest('.MuiDataGrid-root') !== null;
+    //     const clickOutsideRowInEditMode = event.target.getElementsByClassName('MuiDataGrid-row--editing')[0] === event.target;
+    //
+    //     // Check if there is a row in edit mode
+    //     const editingRow = Object.keys(rowModesModel).length > 0;
+    //
+    //     if (editingRow && !clickOutsideRowInEditMode) {
+    //         console.log('User clicked outside of the row in edit mode');
+    //         setRowModesModel(prev => {
+    //             return {...prev}
+    //         })
+    //     }
+    // }, [rowModesModel]);
 
 
     const handleEditClick = useCallback((id) => {
@@ -58,6 +87,59 @@ export default function UberAndLyft() {
     const handleCellDoubleClick = (params, event) => {
         event.preventDefault();
     }
+
+    const handleProcessRowUpdateError = useCallback((error) => {
+        window.displayNotification({type: error.type, content: error.content})
+        console.log(error)
+    }, []);
+
+    const processRowUpdate = useCallback(
+        async (newRow, oldRow) => {
+            await new Promise((resolve, reject) => {
+                //check empty field
+                // const today = new Date();
+                // const newDate = new Date(newRow.date)
+                // if (newDate <= today) {
+                //     return reject({type: 'error', content: 'Date has to be greater than today'});
+                // }
+                const value = checkValidFields(newRow)
+                if (value !== true) {
+                    return reject({type: 'error', content: `${value.key} can't be ${value.value}`});
+                }
+                resolve()
+            })
+            if (JSON.stringify(newRow) === JSON.stringify(oldRow)) {
+                window.displayNotification({
+                    type: 'warning',
+                    content: 'Row not saved, cells are empty'
+                })
+                return oldRow
+            } else {
+                if(newRow.isNew) {
+                    const {isNew, ...rest} = newRow;
+                    window.dispatch(generalSliceActions.createNewRecordInUserTable({
+                        newR: {...rest},
+                        collection: user.select
+                    }))
+                    window.displayNotification({
+                        type: 'success',
+                        content: 'Row saved successfully!!'
+                    })
+                    return rest
+                } else {
+                    window.dispatch(generalSliceActions.updateUserTable({
+                        newRow,
+                        collection: user.select
+                    }))
+                    window.displayNotification({
+                        type: 'success',
+                        content: 'Row edited successfully!!'
+                    })
+                    return newRow
+                }
+            }
+        }, []
+    );
 
     const allProductsVariantsGridColumns = useMemo(
         () => [
@@ -185,7 +267,7 @@ export default function UberAndLyft() {
                     return [
                         <Tooltip title="Edit">
                             <GridActionsCellItem
-                                icon={<EditIcon/>}
+                                icon={<EditIcon sx={{fill: 'white'}}/>}
                                 label="Edit"
                                 disabled={isInEditMode === true}
                                 onClick={_ => handleEditClick(params.id)}
@@ -197,65 +279,15 @@ export default function UberAndLyft() {
             }
         ], [rowModesModel, handleSaveClick, handleCancelClick, handleEditClick])
 
-    const handleProcessRowUpdateError = useCallback((error) => {
-        window.displayNotification({type: error.type, content: error.content})
-        console.log(error)
-    }, []);
-
-    const processRowUpdate = useCallback(
-        async (newRow, oldRow) => {
-            await new Promise((resolve, reject) => {
-                //check empty field
-                // const today = new Date();
-                // const newDate = new Date(newRow.date)
-                // if (newDate <= today) {
-                //     return reject({type: 'error', content: 'Date has to be greater than today'});
-                // }
-                const value = checkValidFields(newRow)
-                if (value !== true) {
-                    return reject({type: 'error', content: `${value.key} can't be ${value.value}`});
-                }
-                resolve()
-            })
-            if (JSON.stringify(newRow) === JSON.stringify(oldRow)) {
-                return oldRow
-            } else {
-                if(newRow.isNew) {
-                    const {isNew, ...rest} = newRow;
-                    window.dispatch(generalSliceActions.createNewRecordInUserTable({
-                        newR: {...rest},
-                        collection: user.select
-                    }))
-                    return rest
-                } else {
-                    window.dispatch(generalSliceActions.updateUserTable({
-                        newRow,
-                        collection: user.select
-                    }))
-                    return newRow
-                }
-            }
-        }, []
-    );
-
     return (
         <RootStyle>
             <Box sx={{height: '100%', width: '100%'}}>
-                <DataGrid
+                <EzMuiGrid
                     rows={rows}
                     columns={allProductsVariantsGridColumns}
-                    pageSize={10}
-                    rowsPerPageOptions={[10, 20]}
-
-                    editMode="row"
-                    onCellDoubleClick={handleCellDoubleClick}
-
                     processRowUpdate={processRowUpdate}
                     onProcessRowUpdateError={handleProcessRowUpdateError}
-                    checkboxSelection
-                    disableSelectionOnClick
-                    experimentalFeatures={{newEditingApi: true}}
-                    onRowModesModelChange={model => setRowModesModel(model)}
+                    setRowModesModel={setRowModesModel}
                     rowModesModel={rowModesModel}
                     components={{
                         Toolbar: Toolbar
@@ -269,14 +301,8 @@ export default function UberAndLyft() {
                             user
                         },
                     }}
-                    //style
-                    getRowClassName={(params) => {
-                        // debugger
-                    }}
-                    sx={({palette}) => ({
-                        color: palette['white'],
-                        backgroundColor: palette['indigoDye']
-                    })}
+                    disableSelectionOnClick
+                    sx={({palette}) => tableSx(palette)}
                 />
             </Box>
         </RootStyle>

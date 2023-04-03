@@ -14,23 +14,19 @@ const RootStyle = styled(Stack)(({theme}) => ({
 
 //----------------------------------------------------------------
 
-export default function Test(props) {
-    const [value, setValue] = useState('test')
+export default function Test() {
+    const [num, setNum] = useState(0)
     return (
-        <EzCustomSelect
-            option={[
-                {
-                    value: 'test',
-                    label: 'Test'
-                },
-                {
-                    value: 'test_1',
-                    label: "Test 1"
-                }
-            ]}
-            value={value}
-            onChange={e => setValue(e.target.value)}
-        />
+        <RootStyle>
+            <button onClick={_ => {
+                //num 0 - num + 1 = 1
+                setNum(prev => prev + 1)
+                //num 0 - num + 1 = 1
+                setNum(prev => prev + 1)
+            }}>+</button>
+            <p style={{color: 'white', fontSize: '24px'}}>{num}</p>
+
+        </RootStyle>
     )
 }
 

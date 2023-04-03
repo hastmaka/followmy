@@ -14,7 +14,7 @@ import {useState} from "react";
 const RootStyle = styled(Stack)(({theme}) => ({
     height: '60px',
     border: '1px solid #e2e2e2',
-    backgroundColor: '#669bbc',
+    backgroundColor: theme.palette['indigoDye'],
     borderRadius: '4px 4px 0 0',
     flexDirection: 'row',
     alignItems: 'center',
@@ -83,7 +83,11 @@ export default function Toolbar({setRows, isAdd, setIsAdd, setRowModesModel, use
                         disabled={isAdd}
                         onClick={handleAddRow}
                     >
-                      <AddIcon/>
+                      <AddIcon
+                          sx={({palette}) => ({
+                              fill: isAdd ? palette['tableBorder'] : palette['tableColor']
+                          })}
+                      />
                     </IconButton>
                   </span>
                 </Tooltip>

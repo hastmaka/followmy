@@ -30,7 +30,7 @@ export default function CssBaseline() {
                     height: '100%',
                     position: 'relative',
                     lineHeight: 1.3,
-                    backgroundColor: '#353535ff'
+                    backgroundColor: '#222'
                 },
                 '#root': {
                     width: '100%',
