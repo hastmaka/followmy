@@ -301,9 +301,6 @@ export default function UberAndLyft() {
                             setRowModesModel,
                             user
                         },
-                        footer: {
-                            rows
-                        }
                     }}
                     disableSelectionOnClick
                     sx={({palette}) => tableSx(palette)}
