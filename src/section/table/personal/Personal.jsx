@@ -33,29 +33,9 @@ export default function Personal() {
 
     useEffect(_ => {
         setRows(user.tableData.data)
-    }, [user.tableData.id]);
+    }, [user.tableData.id, user.tableData.data]);
 
-    const handleEditClick = useCallback((id) => {
-        setRowModesModel({...rowModesModel, [id]: {mode: GridRowModes.Edit}})
-    }, [rowModesModel]);
-
-    const handleSaveClick = useCallback((id) => {
-        setRowModesModel({...rowModesModel, [id]: {mode: GridRowModes.View}})
-        setIsAddActive(false)
-    }, [rowModesModel]);
-
-    const handleCancelClick = useCallback((id) => {
-        setRowModesModel({...rowModesModel, [id]: {mode: GridRowModes.View, ignoreModifications: true}});
-
-        const editedRow = rows.find(item => item.id === id);
-        if (editedRow.isNew) {
-            setRows(prev => prev.filter(item => item.id !== id))
-        }
-        setIsAddActive(false)
-    }, [rowModesModel]);
-
-    const allProductsVariantsGridColumns = useMemo(
-        () => [
+    const columns = [
             {
                 field: 'date',
                 headerName: 'date',
@@ -67,6 +47,8 @@ export default function Personal() {
                 headerAlign: 'center',
                 renderEditCell: (params) => (
                     <CustomSelectCell
+                        daysAlreadyAdded={user.tableData.data.map(item => item.date)}
+                        isNew={params.row.isNew}
                         options={daysToRender}
                         value={params.value}
                         api={params.api}
@@ -91,45 +73,8 @@ export default function Personal() {
                 editable: true,
                 align: 'center',
                 headerAlign: 'center',
-            },
-            {
-                field: 'action',
-                headerName: 'Action',
-                align: 'center',
-                type: 'actions',
-                sortable: false,
-                getActions: (params) => {
-                    const isInEditMode = rowModesModel[params.id]?.mode === GridRowModes.Edit;
-                    if (isInEditMode) {
-                        return [
-                            <GridActionsCellItem
-                                icon={<SaveIcon sx={{fill: 'green'}}/>}
-                                label="Save"
-                                onClick={_ => handleSaveClick(params.id)}
-                            />,
-                            <GridActionsCellItem
-                                icon={<CancelIcon sx={{fill: 'red'}}/>}
-                                label="Cancel"
-                                className="textPrimary"
-                                onClick={_ => handleCancelClick(params.id)}
-                                color="inherit"
-                            />,
-                        ];
-                    }
-                    return [
-                        <Tooltip title="Edit">
-                            <GridActionsCellItem
-                                icon={<EditIcon sx={{fill: 'white'}}/>}
-                                label="Edit"
-                                disabled={isInEditMode === true}
-                                onClick={_ => handleEditClick(params.id)}
-                                // showInMenu
-                            />
-                        </Tooltip>
-                    ]
-                },
             }
-        ], [rowModesModel, handleSaveClick, handleCancelClick, handleEditClick])
+        ]
 
 
     return (
@@ -138,7 +83,11 @@ export default function Personal() {
                 <EzMuiGrid
                     user={user}
                     rows={rows}
-                    columns={allProductsVariantsGridColumns}
+                    setRows={setRows}
+                    columns={columns}
+                    daysToRender={daysToRender}
+                    setIsAddActive={setIsAddActive}
+                    isAddActive={isAddActive}
                     setRowModesModel={setRowModesModel}
                     rowModesModel={rowModesModel}
                     components={{
@@ -152,7 +101,7 @@ export default function Personal() {
                             setIsAddActive,
                             setRowModesModel,
                             user,
-                            columns: allProductsVariantsGridColumns
+                            columns
                         },
                     }}
                     sx={({palette}) => tableSx(palette)}

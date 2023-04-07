@@ -1,5 +1,6 @@
 import {useState} from "react";
 import {useSelector} from "react-redux";
+import PropTypes from "prop-types";
 // material
 import {IconButton, Stack, Tooltip} from "@mui/material";
 import {styled} from '@mui/material/styles';
@@ -10,7 +11,6 @@ import EzText from "../../components/EzText/EzText";
 import {createId, getActualMonthAndYear} from "../../helper";
 import EzCustomSelect from "../../components/EzCustomSelect/EzCustomSelect";
 import {getUserTableData} from "../../helper/firebase/FirestoreApi";
-import PropTypes from "prop-types";
 import {getColumnDataToRenderNewRow} from "../../helper/getColumnDataToRenderNewRow";
 import {sanitizedString} from "../../helper/sanitizedString";
 
@@ -35,6 +35,7 @@ const RootStyle = styled(Stack)(({theme}) => ({
  * @param setIsAddActive - to change the state of isAddActive
  * @param setRowModesModel - to be able to manipulate the new row that was just added and put it in edit mode
  * @param user - object that represent the user variable in store
+ * @param columns - table columns to get the field and render dynamically the new row
  * @returns {JSX.Element}
  * @constructor
  */
@@ -46,11 +47,7 @@ export default function CustomToolBar({setRows, isAddActive, setIsAddActive, set
         setIsAddActive(true)
         const id = createId(20);
         setRows(prev => {
-            return [...prev, {
-                id,
-                ...getColumnDataToRenderNewRow(columns),
-                isNew: true
-            }]
+            return [...prev, {id, ...getColumnDataToRenderNewRow(columns), isNew: true}]
         });
         setRowModesModel(prev => {
             return {
@@ -70,6 +67,7 @@ export default function CustomToolBar({setRows, isAddActive, setIsAddActive, set
                 <Stack direction='row' gap='10px' alignItems='center'>
                     <EzText text='Select Month'/>
                     <EzCustomSelect
+                        disabled={isAddActive}
                         option={[...month]}
                         value={value}
                         onChange={e => {
@@ -108,5 +106,6 @@ CustomToolBar.prototype = {
     isAddActive: PropTypes.bool.isRequired,
     setIsAddActive: PropTypes.func.isRequired,
     setRowModesModel: PropTypes.func.isRequired,
-    user: PropTypes.object.isRequired
+    user: PropTypes.object.isRequired,
+    columns: PropTypes.array.isRequired
 }

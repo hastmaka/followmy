@@ -1,8 +1,15 @@
 // material
-import {DataGrid} from "@mui/x-data-grid";
+import {DataGrid, GridActionsCellItem, GridRowModes} from "@mui/x-data-grid";
 import {checkValidFields} from "../../helper/checkValidFields";
 import {generalSliceActions} from "../../store/adminSlice";
-import {useCallback} from "react";
+import {useCallback, useMemo} from "react";
+import {CustomSelectCell} from "../../section/table/CustomSelectCell";
+import EzText from "../EzText/EzText";
+import SaveIcon from "@mui/icons-material/Save";
+import CancelIcon from "@mui/icons-material/Cancel";
+import {Tooltip} from "@mui/material";
+import EditIcon from "@mui/icons-material/Edit";
+import PropTypes from "prop-types";
 
 //----------------------------------------------------------------
 const tableSx = {
@@ -16,8 +23,6 @@ export default function EzMuiGrid({
     user,
     rows,
     columns,
-    setOpen,
-    GridContainerSx,
     rowModesModel,
     setRowModesModel,
     ...rest
@@ -29,6 +34,25 @@ export default function EzMuiGrid({
         window.displayNotification({type: error.type, content: error.content})
         console.log(error)
     }, []);
+
+    const handleEditClick = useCallback((id) => {
+        setRowModesModel({...rowModesModel, [id]: {mode: GridRowModes.Edit}})
+    }, [rowModesModel]);
+
+    const handleSaveClick = useCallback((id) => {
+        setRowModesModel({...rowModesModel, [id]: {mode: GridRowModes.View}})
+        rest.setIsAddActive(false)
+    }, [rowModesModel]);
+
+    const handleCancelClick = useCallback((id) => {
+        setRowModesModel({...rowModesModel, [id]: {mode: GridRowModes.View, ignoreModifications: true}});
+
+        const editedRow = rows.find(item => item.id === id);
+        if (editedRow.isNew) {
+            rest.setRows(prev => prev.filter(item => item.id !== id))
+        }
+        rest.setIsAddActive(false)
+    }, [rowModesModel]);
 
     const processRowUpdate = useCallback(
         async (newRow, oldRow) => {
@@ -48,7 +72,7 @@ export default function EzMuiGrid({
             if (JSON.stringify(newRow) === JSON.stringify(oldRow)) {
                 window.displayNotification({
                     type: 'warning',
-                    content: 'Row not saved, cells are empty'
+                    content: 'Row not saved, cells are empty or no data was changed'
                 })
                 return oldRow
             } else {
@@ -78,12 +102,62 @@ export default function EzMuiGrid({
         }, []
     );
 
+    const allProductsVariantsGridColumns = useMemo(
+        () => [
+            ...columns,
+            {
+                field: 'action',
+                headerName: 'Action',
+                align: 'center',
+                type: 'actions',
+                sortable: false,
+                getActions: (params) => {
+                    const isInEditMode = rowModesModel[params.id]?.mode === GridRowModes.Edit;
+                    if (isInEditMode) {
+                        return [
+                            <GridActionsCellItem
+                                icon={<SaveIcon sx={{fill: 'green'}}/>}
+                                label='Save'
+                                onClick={_ => {
+                                    rest.setIsAddActive(false);
+                                    handleSaveClick(params.id)
+                                }}
+                            />,
+                            <GridActionsCellItem
+                                icon={<CancelIcon sx={{fill: 'red'}}/>}
+                                label='Cancel'
+                                className='textPrimary'
+                                onClick={_ => {
+                                    rest.setIsAddActive(false);
+                                    handleCancelClick(params.id)
+                                }}
+                                color='inherit'
+                            />,
+                        ];
+                    }
+                    return [
+                        <Tooltip title='Edit'>
+                            <GridActionsCellItem
+                                icon={<EditIcon sx={{fill: 'white'}}/>}
+                                label='Edit'
+                                disabled={isInEditMode === true || rest.isAddActive}
+                                onClick={_ => {
+                                    rest.setIsAddActive(true);
+                                    handleEditClick(params.id)
+                                }}
+                            />
+                        </Tooltip>
+                    ]
+                },
+            }
+        ], [rowModesModel, handleSaveClick, handleCancelClick, handleEditClick, rest.isAddActive])
+
 
     return (
         <DataGrid
             sx={tableSx}
             rows={rows}
-            columns={columns}
+            columns={allProductsVariantsGridColumns}
             getRowId={row => row.id}
             pageSize={10}
             rowsPerPageOptions={[10, 20]}
@@ -99,4 +173,14 @@ export default function EzMuiGrid({
             {...rest}
         />
     );
+}
+
+
+EzMuiGrid.prototype = {
+    user: PropTypes.object.isRequired,
+    rows: PropTypes.array.isRequired,
+    columns: PropTypes.array.isRequired,
+    rowModesModel: PropTypes.object.isRequired,
+    setRowModesModel: PropTypes.func.isRequired,
+    rest: PropTypes.object
 }
