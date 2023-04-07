@@ -1,0 +1,93 @@
+import {useSelector} from "react-redux";
+// material
+import {IconButton, Stack, Tooltip} from "@mui/material";
+import {styled} from '@mui/material/styles';
+import AddIcon from '@mui/icons-material/Add';
+import {GridRowModes} from "@mui/x-data-grid";
+//
+import EzText from "../../../components/EzText/EzText";
+import {createId, getActualMonthAndYear} from "../../../helper";
+import EzCustomSelect from "../../../components/EzCustomSelect/EzCustomSelect";
+import {getUserTableData} from "../../../helper/firebase/FirestoreApi";
+import {useState} from "react";
+
+//---------------------------------------------------------------------------------
+
+const RootStyle = styled(Stack)(({theme}) => ({
+    height: '60px',
+    border: `1px solid ${theme.palette['tableBorder']}`,
+    backgroundColor: theme.palette['indigoDye'],
+    borderRadius: '4px 4px 0 0',
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: '0 10px',
+    justifyContent: 'space-between'
+}));
+
+//---------------------------------------------------------------------------------
+
+export default function PersonalToolBar({setRows, isAdd, setIsAdd, setRowModesModel, user}) {
+    const {month} = useSelector(slice => slice.admin)
+    const [value, setValue] = useState(getActualMonthAndYear())
+    const handleAddRow = async () => {
+        setIsAdd(true)
+        const id = createId(20);
+        setRows(prev => {
+            return [...prev, {
+                id,
+                date: '',
+                deposit: 0,
+                expenses: 0,
+                isNew: true
+            }]
+        });
+        setRowModesModel(prev => {
+            return {
+                ...prev,
+                [id]: {mode: GridRowModes.Edit, fieldToFocus: 'date'}
+            }
+        })
+    }
+    return (
+        <RootStyle>
+            <EzText
+                text={user.select === 'uber_and_lyft' ? 'Uber and Lyft' : 'Personal'}
+                sx={{color: 'white'}}
+            />
+
+            <Stack direction='row' gap='10px' alignItems='center'>
+                <Stack direction='row' gap='10px' alignItems='center'>
+                    <EzText text='Select Month'/>
+                    <EzCustomSelect
+                        option={[...month]}
+                        value={value}
+                        onChange={e => {
+                            setValue(e.target.value)
+                            window.dispatch(getUserTableData({
+                                uid: user.uid,
+                                collection: user.select,
+                                monthAndYear: e.target.value
+                            }))
+                        }}
+                        from='toolbar'
+                    />
+                </Stack>
+
+                <Tooltip title="Add" placement="bottom">
+                  <span>
+                    <IconButton
+                        disabled={isAdd}
+                        onClick={handleAddRow}
+                    >
+                      <AddIcon
+                          sx={({palette}) => ({
+                              fill: isAdd ? palette['tableBorder'] : palette['tableColor']
+                          })}
+                      />
+                    </IconButton>
+                  </span>
+                </Tooltip>
+            </Stack>
+        </RootStyle>
+    )
+}

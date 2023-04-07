@@ -1,20 +1,19 @@
+import {useSelector} from "react-redux";
+import {useCallback, useEffect, useMemo, useState} from "react";
 // material
 import {Box, Stack, Tooltip} from "@mui/material";
 import {styled} from '@mui/material/styles';
-import EzMuiGrid from "../../../components/EzMuiGrid/EzMuiGrid";
-import {useSelector} from "react-redux";
-import {monthDays} from "../../../helper";
-import {useCallback, useMemo, useState} from "react";
-import {CustomSelectCell} from "../CustomSelectCell";
-import EzText from "../../../components/EzText/EzText";
 import {GridActionsCellItem, GridRowModes} from "@mui/x-data-grid";
 import SaveIcon from "@mui/icons-material/Save";
 import CancelIcon from "@mui/icons-material/Cancel";
 import EditIcon from "@mui/icons-material/Edit";
-import Toolbar from "../personal/ToolBar";
+//
+import EzMuiGrid from "../../../components/EzMuiGrid/EzMuiGrid";
+import {monthDays} from "../../../helper";
+import {CustomSelectCell} from "../CustomSelectCell";
+import PersonalFooter from "./PersonalFooter";
 import {tableSx} from "../../../helper/Style";
-import {checkValidFields} from "../../../helper/checkValidFields";
-import {generalSliceActions} from "../../../store/adminSlice";
+import CustomToolBar from "../CustomToolBar";
 
 //----------------------------------------------------------------
 
@@ -30,7 +29,11 @@ export default function Personal() {
     const [rows, setRows] = useState([]);
     const daysToRender = useMemo(() => monthDays(user.tableData.id), [user.tableData.id])
     const [rowModesModel, setRowModesModel] = useState({});
-    const [isAdd, setIsAdd] = useState(false);
+    const [isAddActive, setIsAddActive] = useState(false);
+
+    useEffect(_ => {
+        setRows(user.tableData.data)
+    }, [user.tableData.id]);
 
     const handleEditClick = useCallback((id) => {
         setRowModesModel({...rowModesModel, [id]: {mode: GridRowModes.Edit}})
@@ -38,7 +41,7 @@ export default function Personal() {
 
     const handleSaveClick = useCallback((id) => {
         setRowModesModel({...rowModesModel, [id]: {mode: GridRowModes.View}})
-        setIsAdd(false)
+        setIsAddActive(false)
     }, [rowModesModel]);
 
     const handleCancelClick = useCallback((id) => {
@@ -48,61 +51,8 @@ export default function Personal() {
         if (editedRow.isNew) {
             setRows(prev => prev.filter(item => item.id !== id))
         }
-        setIsAdd(false)
+        setIsAddActive(false)
     }, [rowModesModel]);
-
-    const handleProcessRowUpdateError = useCallback((error) => {
-        window.displayNotification({type: error.type, content: error.content})
-        console.log(error)
-    }, []);
-
-    const processRowUpdate = useCallback(
-        async (newRow, oldRow) => {
-            await new Promise((resolve, reject) => {
-                //check empty field
-                // const today = new Date();
-                // const newDate = new Date(newRow.date)
-                // if (newDate <= today) {
-                //     return reject({type: 'error', content: 'Date has to be greater than today'});
-                // }
-                const value = checkValidFields(newRow)
-                if (value !== true) {
-                    return reject({type: 'error', content: `${value.key} can't be ${value.value}`});
-                }
-                resolve()
-            })
-            if (JSON.stringify(newRow) === JSON.stringify(oldRow)) {
-                window.displayNotification({
-                    type: 'warning',
-                    content: 'Row not saved, cells are empty'
-                })
-                return oldRow
-            } else {
-                if(newRow.isNew) {
-                    const {isNew, ...rest} = newRow;
-                    window.dispatch(generalSliceActions.createNewRecordInUserTable({
-                        newR: {...rest},
-                        collection: user.select
-                    }))
-                    window.displayNotification({
-                        type: 'success',
-                        content: 'Row saved successfully!!'
-                    })
-                    return rest
-                } else {
-                    window.dispatch(generalSliceActions.updateUserTable({
-                        newRow,
-                        collection: user.select
-                    }))
-                    window.displayNotification({
-                        type: 'success',
-                        content: 'Row edited successfully!!'
-                    })
-                    return newRow
-                }
-            }
-        }, []
-    );
 
     const allProductsVariantsGridColumns = useMemo(
         () => [
@@ -125,44 +75,8 @@ export default function Personal() {
                 ),
             },
             {
-                field: 'uber',
-                headerName: 'uber',
-                type: 'number',
-                flex: 1,
-                editable: true,
-                align: 'center',
-                headerAlign: 'center',
-            },
-            {
-                field: 'lyft',
-                headerName: 'lyft',
-                type: 'number',
-                flex: 1,
-                editable: true,
-                align: 'center',
-                headerAlign: 'center',
-            },
-            {
-                field: 'other',
-                headerName: 'other',
-                type: 'number',
-                flex: 1,
-                editable: true,
-                align: 'center',
-                headerAlign: 'center',
-            },
-            {
-                field: 'hours',
-                headerName: 'hours',
-                type: 'number',
-                flex: 1,
-                editable: true,
-                align: 'center',
-                headerAlign: 'center',
-            },
-            {
-                field: 'gas',
-                headerName: 'gas',
+                field: 'deposit',
+                headerName: 'deposit',
                 type: 'number',
                 flex: 1,
                 editable: true,
@@ -177,31 +91,6 @@ export default function Personal() {
                 editable: true,
                 align: 'center',
                 headerAlign: 'center',
-            },
-            {
-                field: 'miles',
-                headerName: 'miles',
-                type: 'number',
-                flex: 1,
-                editable: true,
-                align: 'center',
-                headerAlign: 'center',
-                renderCell: (params) => {
-                    return <EzText text={`${params.row.miles} / $${params.row.miles * 0.08}`}/>
-                }
-            },
-            {
-                field: 'dollarsPerHour',
-                headerName: '$/hr',
-                type: 'number',
-                flex: 1,
-                align: 'center',
-                headerAlign: 'center',
-                renderCell: (params) => {
-                    const {uber, lyft, other, hours, miles, gas, expenses} = params.row;
-                    const real = (uber + lyft + other - gas - expenses - miles * 0.08) / hours
-                    return <EzText text={`${real.toFixed(2)} / hr`}/>
-                }
             },
             {
                 field: 'action',
@@ -247,22 +136,23 @@ export default function Personal() {
         <RootStyle>
             <Box sx={{height: '100%', width: '100%'}}>
                 <EzMuiGrid
+                    user={user}
                     rows={rows}
                     columns={allProductsVariantsGridColumns}
-                    processRowUpdate={processRowUpdate}
-                    onProcessRowUpdateError={handleProcessRowUpdateError}
                     setRowModesModel={setRowModesModel}
                     rowModesModel={rowModesModel}
                     components={{
-                        Toolbar: Toolbar
+                        Toolbar: CustomToolBar,
+                        Footer: PersonalFooter
                     }}
                     componentsProps={{
                         toolbar: {
                             setRows,
-                            isAdd,
-                            setIsAdd,
+                            isAddActive,
+                            setIsAddActive,
                             setRowModesModel,
-                            user
+                            user,
+                            columns: allProductsVariantsGridColumns
                         },
                     }}
                     sx={({palette}) => tableSx(palette)}
@@ -270,4 +160,4 @@ export default function Personal() {
             </Box>
         </RootStyle>
     );
-}
+};

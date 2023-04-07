@@ -8,15 +8,13 @@ import SaveIcon from '@mui/icons-material/Save';
 import CancelIcon from '@mui/icons-material/Cancel';
 import EditIcon from '@mui/icons-material/Edit';
 //
-import Toolbar from './ToolBar';
-import Footer from './Footer';
-import {checkValidFields} from '../../../helper/checkValidFields';
+import UberAndLyftFooter from './UberAndLyftFooter';
 import EzText from '../../../components/EzText/EzText';
-import {generalSliceActions} from '../../../store/adminSlice';
 import {monthDays} from '../../../helper';
 import {CustomSelectCell} from '../CustomSelectCell';
 import {tableSx} from '../../../helper/Style';
 import EzMuiGrid from '../../../components/EzMuiGrid/EzMuiGrid';
+import CustomToolBar from "../CustomToolBar";
 
 //-----------------------------------------------------------------------
 
@@ -31,39 +29,11 @@ export default function UberAndLyft() {
     const [rows, setRows] = useState([]);
     const daysToRender = useMemo(() => monthDays(user.tableData.id), [user.tableData.id])
     const [rowModesModel, setRowModesModel] = useState({});
-    const [isAdd, setIsAdd] = useState(false)
+    const [isAddActive, setIsAddActive] = useState(false);
 
     useEffect(_ => {
         setRows(user.tableData.data)
     }, [user.tableData.id]);
-
-    // useEffect(_ => {
-    //     if (Object.keys(rowModesModel).length > 0) {
-    //         document.addEventListener('click', handleClickOutsideRow);
-    //     }
-    //     // Remove the event listener when a row is not in edit mode
-    //     return () => {
-    //         document.removeEventListener('click', handleClickOutsideRow);
-    //     };
-    // }, [rowModesModel])
-    //
-    //
-    // const handleClickOutsideRow = useCallback((event) => {
-    //     // Check if the click event target is inside the MUI Data Grid
-    //     // const insideDataGrid = event.target.closest('.MuiDataGrid-root') !== null;
-    //     const clickOutsideRowInEditMode = event.target.getElementsByClassName('MuiDataGrid-row--editing')[0] === event.target;
-    //
-    //     // Check if there is a row in edit mode
-    //     const editingRow = Object.keys(rowModesModel).length > 0;
-    //
-    //     if (editingRow && !clickOutsideRowInEditMode) {
-    //         console.log('User clicked outside of the row in edit mode');
-    //         setRowModesModel(prev => {
-    //             return {...prev}
-    //         })
-    //     }
-    // }, [rowModesModel]);
-
 
     const handleEditClick = useCallback((id) => {
         setRowModesModel({...rowModesModel, [id]: {mode: GridRowModes.Edit}})
@@ -71,7 +41,7 @@ export default function UberAndLyft() {
 
     const handleSaveClick = useCallback((id) => {
         setRowModesModel({...rowModesModel, [id]: {mode: GridRowModes.View}})
-        setIsAdd(false)
+        setIsAddActive(false)
     }, [rowModesModel]);
 
     const handleCancelClick = useCallback((id) => {
@@ -81,65 +51,12 @@ export default function UberAndLyft() {
         if (editedRow.isNew) {
             setRows(prev => prev.filter(item => item.id !== id))
         }
-        setIsAdd(false)
+        setIsAddActive(false)
     }, [rowModesModel]);
 
     const handleCellDoubleClick = (params, event) => {
         event.preventDefault();
     }
-
-    const handleProcessRowUpdateError = useCallback((error) => {
-        window.displayNotification({type: error.type, content: error.content})
-        console.log(error)
-    }, []);
-
-    const processRowUpdate = useCallback(
-        async (newRow, oldRow) => {
-            await new Promise((resolve, reject) => {
-                //check empty field
-                // const today = new Date();
-                // const newDate = new Date(newRow.date)
-                // if (newDate <= today) {
-                //     return reject({type: 'error', content: 'Date has to be greater than today'});
-                // }
-                const value = checkValidFields(newRow)
-                if (value !== true) {
-                    return reject({type: 'error', content: `${value.key} can't be ${value.value}`});
-                }
-                resolve()
-            })
-            if (JSON.stringify(newRow) === JSON.stringify(oldRow)) {
-                window.displayNotification({
-                    type: 'warning',
-                    content: 'Row not saved, cells are empty'
-                })
-                return oldRow
-            } else {
-                if(newRow.isNew) {
-                    const {isNew, ...rest} = newRow;
-                    window.dispatch(generalSliceActions.createNewRecordInUserTable({
-                        newR: {...rest},
-                        collection: user.select
-                    }))
-                    window.displayNotification({
-                        type: 'success',
-                        content: 'Row saved successfully!!'
-                    })
-                    return rest
-                } else {
-                    window.dispatch(generalSliceActions.updateUserTable({
-                        newRow,
-                        collection: user.select
-                    }))
-                    window.displayNotification({
-                        type: 'success',
-                        content: 'Row edited successfully!!'
-                    })
-                    return newRow
-                }
-            }
-        }, []
-    );
 
     const allProductsVariantsGridColumns = useMemo(
         () => [
@@ -283,23 +200,23 @@ export default function UberAndLyft() {
         <RootStyle>
             <Box sx={{height: '100%', width: '100%'}}>
                 <EzMuiGrid
+                    user={user}
                     rows={rows}
                     columns={allProductsVariantsGridColumns}
-                    processRowUpdate={processRowUpdate}
-                    onProcessRowUpdateError={handleProcessRowUpdateError}
                     setRowModesModel={setRowModesModel}
                     rowModesModel={rowModesModel}
                     components={{
-                        Toolbar: Toolbar,
-                        Footer: Footer
+                        Toolbar: CustomToolBar,
+                        Footer: UberAndLyftFooter
                     }}
                     componentsProps={{
                         toolbar: {
                             setRows,
-                            isAdd,
-                            setIsAdd,
+                            isAddActive,
+                            setIsAddActive,
                             setRowModesModel,
-                            user
+                            user,
+                            columns: allProductsVariantsGridColumns
                         },
                     }}
                     disableSelectionOnClick
